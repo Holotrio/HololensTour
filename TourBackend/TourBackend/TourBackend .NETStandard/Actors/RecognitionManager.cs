@@ -7,6 +7,7 @@ using Proto;
 using System.Drawing;
 using Emgu;
 using Emgu.CV.Aruco;
+
 namespace TourBackend
 {
     public class RecognitionManager : IActor
