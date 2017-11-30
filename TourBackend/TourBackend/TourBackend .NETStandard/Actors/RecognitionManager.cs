@@ -7,7 +7,6 @@ using Proto;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using System.Drawing;
-using OpenCvSharp.Aruco;
 
 namespace TourBackend
 {
