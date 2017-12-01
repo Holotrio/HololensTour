@@ -18,21 +18,38 @@ namespace TourBackend
 
         public System.Drawing.Bitmap ReturnAndSetNextFrame()
         {
-            return null;
+            Bitmap returnvalue = frames[currentIdx];
+            if (currentIdx == frames.Length - 1)
+            {
+                currentIdx = 0;
+            }
+            else {
+                currentIdx++;
+            }
+            return returnvalue;
         }
 
         public System.Drawing.Bitmap ReturnAndSetPreviousFrame()
         {
-            return null;
+            Bitmap returnvalue = frames[currentIdx];
+            if (currentIdx == 0)
+            {
+                currentIdx = frames.Length-1;
+            }
+            else
+            {
+                currentIdx--;
+            }
+            return returnvalue;
         }
 
         public System.Drawing.Bitmap GetCurrentFrame()
         {
-            return null;
+            return frames[currentIdx];
         }
 
         public void Reset() {
-
+            currentIdx = 0;
         }
 
 

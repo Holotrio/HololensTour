@@ -134,7 +134,7 @@ namespace TourBackend
             float[] _distCo = { 0.1611302127599187f, 0.11645978908419138f, -0.020783847362699993f, -0.006686827095385685f, 0.0f};
             VectorOfFloat _distortionCoefficients = new VectorOfFloat(_distCo);
 
-            Emgu.CV.Image<Bgr, Byte> _image = Utils.CreateMatfromArray(_bitmap, _width, _height);
+            Emgu.CV.Image<Bgr, Byte> _image = Utils.BitmapToImage.CreateImagefromBitmap(_bitmap);
 
             var _outCorners = new VectorOfVectorOfPointF();
 
