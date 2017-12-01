@@ -36,7 +36,7 @@
 
         <Image
                 x:Name="Framebox"
-                Source="../TestWPFApp/Resources/aruco_265.jpg"
+                Source="../TourBackendWPFGUI/Resources/aruco_265.jpg"
                 Grid.Row="2"
                 Grid.RowSpan="6"
                 Grid.Column="2"
@@ -163,7 +163,7 @@
         </Border>
 
         <StackPanel Margin="10" Grid.Row="4" Grid.RowSpan="2" Grid.Column="6" Grid.ColumnSpan="2">
-            <ComboBox x:Name="Markers" IsEditable="True">
+            <ComboBox x:Name="Markers" IsEditable="True" SelectedItem="" DropDownClosed="Markers_DropDownClosed">
                 <!--<ComboBoxItem x:Name="Marker1">Marker #1</ComboBoxItem>
                 <ComboBoxItem>Marker #2</ComboBoxItem>
                 <ComboBoxItem>Marker #3</ComboBoxItem>-->

@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 #endif
 
-namespace TourBackendWPFGUI
+namespace TourBackend
 {
     public static class CopySyncDict
     {

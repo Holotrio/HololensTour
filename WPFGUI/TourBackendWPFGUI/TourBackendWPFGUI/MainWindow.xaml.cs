@@ -144,5 +144,18 @@ namespace TourBackendWPFGUI
             windowHeight = newWindowHeight;
             windowWidth = newWindowWidth;
         }
+
+        private void DisplayContentCodeObject()
+        {
+
+        }
+
+        private void Markers_DropDownClosed(object sender, EventArgs e)
+        {
+            //here you change all the values of the codeobject
+            MessageBox.Show(Markers.Text);
+            //compare dict and get values
+
+        }
     }
 }

@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TourBackendWPFGUI
+namespace TourBackend
 {
     public class CameraFeedSyncObject
     {
 
         public Int64 timestamp;
-
+        
         //public Windows.Graphics.Imaging.SoftwareBitmap bitmap;
         public string id;
         public object thisLock = new Object();
