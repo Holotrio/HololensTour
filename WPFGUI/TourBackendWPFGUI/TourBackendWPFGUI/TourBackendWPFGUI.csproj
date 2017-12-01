@@ -36,6 +36,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -62,6 +63,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="CommandTestFrames.cs" />
     <Compile Include="ControlToCameraFeedActorProtocol.cs" />
     <Compile Include="ControlToSyncActorProtocol.cs" />
     <Compile Include="CopySyncDict.cs" />
@@ -98,6 +100,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\aruco_265.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\frame59.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

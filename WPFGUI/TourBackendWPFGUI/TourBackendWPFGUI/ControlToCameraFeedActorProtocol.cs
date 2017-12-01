@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
 
 namespace TourBackend
 {
@@ -10,8 +11,8 @@ namespace TourBackend
     {
 
         public Int64 timestamp;
-        
-        //public Windows.Graphics.Imaging.SoftwareBitmap bitmap;
+
+        public Bitmap bitmap;
         public string id;
         public object thisLock = new Object();
 
@@ -41,13 +42,12 @@ namespace TourBackend
     public class NewFrameArrived
     {
         public string id;
-        /*public Windows.Graphics.Imaging.SoftwareBitmap bitmap;
+        public Bitmap bitmap;
 
-        public NewFrameArrived(string _id, Windows.Graphics.Imaging.SoftwareBitmap _bitmap)
+        public NewFrameArrived(string _id, Bitmap _bitmap)
         {
-                id = _id;
-                bitmap = _bitmap;
-        }*/
+            id = _id;
+            bitmap = _bitmap;
+        }
     }
-
 }

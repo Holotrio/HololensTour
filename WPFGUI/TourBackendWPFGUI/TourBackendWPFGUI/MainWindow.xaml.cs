@@ -1,6 +1,8 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using TourBackend;
 
 namespace TourBackendWPFGUI
 {
@@ -32,6 +35,9 @@ namespace TourBackendWPFGUI
         public SyncObject syncObject;
         public Dictionary<int, CodeObject> CopyOfDict;// = new Dictionary<string, CodeObject>();
         public System.Int64 lasttimestamp;
+
+        public CommandTestFrames frames;
+        public bool framesactivated = false;
 
         public MainWindow()
         {/*
@@ -92,6 +98,22 @@ namespace TourBackendWPFGUI
             }
         }
 
+        BitmapImage BitmapToImageSource(Bitmap bitmap)
+        {
+            using (MemoryStream memory = new MemoryStream())
+            {
+                bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
+                memory.Position = 0;
+                BitmapImage bitmapimage = new BitmapImage();
+                bitmapimage.BeginInit();
+                bitmapimage.StreamSource = memory;
+                bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapimage.EndInit();
+
+                return bitmapimage;
+            }
+        }
+
         private void Exit_Click(object sender, RoutedEventArgs e)
         {
             //MessageBox.Show("App is closing");
@@ -109,7 +131,10 @@ namespace TourBackendWPFGUI
             if (openFileDialog.ShowDialog() == true)
             {
                 //here choose your file
-                Framebox.Source = new BitmapImage(new Uri(openFileDialog.FileName));
+                //Framebox.Source = new BitmapImage(new Uri(openFileDialog.FileName));
+                Framebox.Source = BitmapToImageSource(new Bitmap(openFileDialog.FileName));
+                frames = new CommandTestFrames(System.IO.Directory.GetFiles(System.IO.Path.GetDirectoryName(openFileDialog.FileName)).Where(m => m.ToUpper().EndsWith("JPG") || m.ToUpper().EndsWith("BMP") || m.ToUpper().EndsWith("GIF") || m.ToUpper().EndsWith("PNG")));
+                framesactivated = true;
             }
         }
 
@@ -156,6 +181,22 @@ namespace TourBackendWPFGUI
             MessageBox.Show(Markers.Text);
             //compare dict and get values
 
+        }
+
+        private void Next_Click(object sender, RoutedEventArgs e)
+        {
+            if (framesactivated && frames.length != 0)
+            {
+                Framebox.Source = BitmapToImageSource(frames.ReturnAndSetNextFrame());
+            }
+        }
+
+        private void Previous_Click(object sender, RoutedEventArgs e)
+        {
+            if (framesactivated && frames.length != 0)
+            {
+                Framebox.Source = BitmapToImageSource(frames.ReturnAndSetPreviousFrame());
+            }
         }
     }
 }
