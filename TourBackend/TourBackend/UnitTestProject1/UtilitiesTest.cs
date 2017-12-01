@@ -292,4 +292,9 @@ namespace TourBackend
             Assert.AreEqual(cmnd.currentIdx, 0);
         }
     }
+    [TestClass]
+    public class HelpForTesting
+    {
+
+    }
 }

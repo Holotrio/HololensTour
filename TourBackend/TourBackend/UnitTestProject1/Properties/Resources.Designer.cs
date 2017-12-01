@@ -83,46 +83,6 @@ namespace UnitTestProject1.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Byte[].
         /// </summary>
-        internal static byte[] test_aruco_id_1 {
-            get {
-                object obj = ResourceManager.GetObject("test_aruco_id_1", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Ressource vom Typ System.Byte[].
-        /// </summary>
-        internal static byte[] test_aruco_id_1_2 {
-            get {
-                object obj = ResourceManager.GetObject("test_aruco_id_1_2", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Ressource vom Typ System.Byte[].
-        /// </summary>
-        internal static byte[] test_aruco_id_1_2_3 {
-            get {
-                object obj = ResourceManager.GetObject("test_aruco_id_1_2_3", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Ressource vom Typ System.Byte[].
-        /// </summary>
-        internal static byte[] test_aruco_none {
-            get {
-                object obj = ResourceManager.GetObject("test_aruco_none", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Ressource vom Typ System.Byte[].
-        /// </summary>
         internal static byte[] TestVideo_000 {
             get {
                 object obj = ResourceManager.GetObject("TestVideo_000", resourceCulture);

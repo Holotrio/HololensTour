@@ -88,5 +88,40 @@ namespace TourBackend
                 // It's possible that the returned Image has to be flipped to acheive intended behaviour.
             }
         }
+
+        public static class HelpForTesting
+        {
+            /// <summary>
+            /// creates ten markers with all the components needed to initialise the Recognition Manager with all
+            /// the markers that have the isActive to false
+            /// </summary>
+            /// <returns></returns>
+            public static Dictionary<int, CodeObject> CreateDictionaryForInitialization(int _numberOfCodeObjects)
+            {
+                int[] ids = new int[_numberOfCodeObjects];
+                float[][] positions = new float[_numberOfCodeObjects][];
+                float[][] rotations = new float[_numberOfCodeObjects][];
+                const bool isActive = false;
+                Dictionary<int, CodeObject> returnDict = new Dictionary<int, CodeObject>();
+
+                for (int i = 0; i < _numberOfCodeObjects; ++i)
+                {
+                    ids[i] = i;
+                    positions[i][0] = 1f + i;
+                    positions[i][1] = 2f + i;
+                    positions[i][2] = 3f + i;
+                    rotations[i][0] = 0.1f + i;
+                    rotations[i][1] = 0.1f + i;
+                    rotations[i][2] = 0.1f + i;
+                }
+
+                for (int i = 0; i < _numberOfCodeObjects; ++i)
+                {
+                    CodeObject codeObject = new CodeObject(ids[i], positions[i], rotations[i], isActive);
+                    returnDict.Add(codeObject.id, codeObject);
+                }
+                return returnDict;
+            }
+        }
     }
 }

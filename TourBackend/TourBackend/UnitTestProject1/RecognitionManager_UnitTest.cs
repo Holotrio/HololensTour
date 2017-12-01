@@ -193,34 +193,10 @@ namespace TourBackend
         [TestMethod]
         public async Task Control_forwards_message_NewFrameArrived_to_the_recognitionManager()
         {
-            // first create some objects which should be in the dictionary of the recognition Manager in the 
-            // initialize step => all codeObjects should have the isActive false
-            // CodeObject 1
-            int _codeObjectID1 = 1;
-            float[] _position1 = { 1f, 2f, 4f };
-            float[] _rotation1 = { 1f, 2.3f, 34f, 0.5f, 2f, 3f, 8.9f, 0.9f, 2.1f };
-            bool _isActive1 = true;
-            CodeObject _codeObject1 = new CodeObject(_codeObjectID1, _position1, _rotation1, _isActive1);
-            // CodeObject 2
-            int _codeObjectID2 = 2;
-            float[] _position2 = { 2f, 2f, 4f };
-            float[] _rotation2 = { 2f, 2.3f, 34f, 0.5f, 2f, 3f, 8.9f, 0.9f, 2.1f };
-            bool _isActive2 = false;
-            CodeObject _codeObject2 = new CodeObject(_codeObjectID2, _position2, _rotation2, _isActive2);
-            // CodeObject 3, this time we want to have the codeObject to be initialised with the default value
-            // true for the isActive 
-            int _codeObjectID3 = 3;
-            float[] _position3 = { 3f, 2f, 4f };
-            float[] _rotation3 = { 3f, 2.3f, 34f, 0.5f, 2f, 3f, 8.9f, 0.9f, 2.1f };
-            CodeObject _codeObject3 = new CodeObject(_codeObjectID3, _position3, _rotation3);
-            // then create the dictionary for initialisation of the recognition manager
-            Dictionary<int, CodeObject> _initialDict = new Dictionary<int, CodeObject>();
-            _initialDict.Add(_codeObjectID1, _codeObject1);
-            _initialDict.Add(_codeObjectID2, _codeObject2);
-            _initialDict.Add(_codeObjectID3, _codeObject3);
+            Dictionary<int, CodeObject> initialDict = Utils.HelpForTesting.CreateDictionaryForInitialization(10);
             // then create the testrecognition manager and the dictionary with all the initialized markers in it. 
             // But all have isActive = false...
-            var _propsTestRecognitionManager = Actor.FromProducer(() => new RecognitionManager("RecognitionManager", _initialDict));
+            var _propsTestRecognitionManager = Actor.FromProducer(() => new RecognitionManager("RecognitionManager", initialDict));
             var _pidTestRecognitionManager = Actor.Spawn(_propsTestRecognitionManager);
             // create a new object of the message type NewFrameArrived. for this we need firstly a new messageID
             string _messageID = "NewFrameArrived1";
@@ -241,12 +217,63 @@ namespace TourBackend
         }
 
         /// <summary>
-        /// the idea here is that if the controlActor sends the message NewFrameArrived to the RecognitionManager
-        /// that he does the evaluation of the frame and . After the evaluation of the frame the Recognition Manager should update his values in the
-        /// dictionary CodeObjectIDToCodeObject. After that he should respond to the controlActor with the corresponding 
-        /// defined message: RespondNewFrameArrived
+        /// the idea here is that if the controlActor sends the message NewFrameArrived to the RecognitionManager (=RM), then 
+        /// the RM makes the evaluation of the frames and After the that he should update his values in the
+        /// dictionary CodeObjectIDToCodeObject. Finally the RM should respond to the controlActor with the corresponding 
+        /// defined message: RespondNewFrameArrived to signalise that all works perfectly fine.
         /// </summary>
-        /// <returns></returns>
+        [TestMethod]
+        public async Task RecognitionManager_evaluates_one_frame_with_no_marker_correctly()
+        {
+
+        }
+
+        /// <summary>
+        /// the idea here is that if the controlActor sends the message NewFrameArrived to the RecognitionManager (=RM), then 
+        /// the RM makes the evaluation of the frames and After the that he should update his values in the
+        /// dictionary CodeObjectIDToCodeObject. Finally the RM should respond to the controlActor with the corresponding 
+        /// defined message: RespondNewFrameArrived to signalise that all works perfectly fine.
+        /// </summary>
+        [TestMethod]
+        public async Task RecognitionManager_evaluates_one_frame_with_one_marker_correctly()
+        {
+            // then create the testrecognition manager and the dictionary with all the initialized markers in it. 
+            // But all have isActive = false...
+            Dictionary<int, CodeObject> initialDict = Utils.HelpForTesting.CreateDictionaryForInitialization(10);
+            var _propsTestRecognitionManager = Actor.FromProducer(() => new RecognitionManager("RecognitionManager", initialDict));
+            var _pidTestRecognitionManager = Actor.Spawn(_propsTestRecognitionManager);
+
+            // create a new object of the message type NewFrameArrived
+            string _messageID = "NewFrameArrived";
+            var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            path = Path.Combine(path, "Resources");
+            path = Path.Combine(path, "TestVideo_000.bmp");
+            Stream testfile = File.OpenRead(path);
+            var _testbitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(testfile);
+
+            // now we are able to create the message
+            var msg = new NewFrameArrived(_messageID, _testbitmap);
+
+            // now send this message to the recognitionManager and get the answer in the response variable
+            var response = await _pidTestRecognitionManager.RequestAsync<RespondNewFrameArrived>(msg, TimeSpan.FromSeconds(1));
+
+            // now check if we get the right answer meaning the right message id
+            Assert.AreEqual(response.messageID, _messageID);
+        }
+
+        /// <summary>
+        /// the idea here is that if the controlActor sends the message NewFrameArrived to the RecognitionManager (=RM), then 
+        /// the RM makes the evaluation of the frames and After the that he should update his values in the
+        /// dictionary CodeObjectIDToCodeObject. Finally the RM should respond to the controlActor with the corresponding 
+        /// defined message: RespondNewFrameArrived to signalise that all works perfectly fine.
+        /// </summary>
+        [TestMethod]
+        public async Task RecognitionManager_evaluates_one_frame_with_multiple_markers_correctly()
+        {
+
+        }
+
+
         [TestMethod]
         public async Task RecognitionManager_evaluates_the_frames_correctly()
         {
@@ -294,7 +321,7 @@ namespace TourBackend
             var path1 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path1 = Path.Combine(path1, "Resources");
             // here choose a file which has no marker in it
-            path1 = Path.Combine(path1, "test_aruco_none.bmp");
+            path1 = Path.Combine(path1, "KusiPOC.bmp");
             Stream testfile1 = File.OpenRead(path1);
             var _testbitmapNoMarker = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(testfile1);
             // now we are able to create the message
@@ -326,7 +353,7 @@ namespace TourBackend
             var path2 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path2 = Path.Combine(path2, "Resources");
             // here choose a file which has one marker in it and the marker has the same id from codeObject2
-            path2 = Path.Combine(path2, "test_aruco_id_1.bmp");
+            path2 = Path.Combine(path2, "KusiPOC.bmp");
             Stream testfile2 = File.OpenRead(path2);
             var _testbitmapOneMarker = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(testfile2);
             // now we are able to create the message
@@ -358,7 +385,7 @@ namespace TourBackend
             var path3 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path3 = Path.Combine(path3, "Resources");
             // here choose a file which has one marker in it and the marker has the same id from codeObject2
-            path3 = Path.Combine(path3, "test_aruco_id_1_2_3.bmp");
+            path3 = Path.Combine(path3, "KusiPOC.bmp");
             Stream testfile3 = File.OpenRead(path3);
             var _testbitmapThreeMarkers = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(testfile3);
             // now we are able to create the message

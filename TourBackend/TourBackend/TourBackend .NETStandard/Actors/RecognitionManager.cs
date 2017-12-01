@@ -96,15 +96,15 @@ namespace TourBackend
                         }
                     }
                     break;
-
+                // the idea here is if the recognition manager gets this message, he takes the frame, evaluate it and
+                // then update the internal dictionary. having done this he should reply to the controlActor that all is good
                 case NewFrameArrived n:
                     {
                         // do the work here with the recognition of the frame
                         FrameEvaluation(n.bitmap);
 
                         // after the successfull evaluation respond to the control Actor
-                        var _respondMsg = new RespondNewFrameArrived(n.id);
-                        context.Sender.Tell(_respondMsg);
+                        context.Sender.Tell(new RespondNewFrameArrived(n.id));
                     }
                     break;
             }
@@ -117,80 +117,32 @@ namespace TourBackend
         /// </summary>
         public void FrameEvaluation(Bitmap _bitmap)
         {
+            // first set all arguments for the DetectMarkers function call
+            Emgu.CV.Image<Bgr, Byte> _image = Utils.BitmapToImage.CreateImagefromBitmap(_bitmap);
+            var MarkerTypeToFind = new Dictionary(Dictionary.PredefinedDictionaryName.DictArucoOriginal);
+            var outCorners = new VectorOfVectorOfPointF();
+            var outIDs = new VectorOfInt();
+            DetectorParameters _detectorParameters = DetectorParameters.GetDefault();
 
-            /*
-             To Kiser with love
+            // now detect the markers in the image bitmap
+            Emgu.CV.Aruco.ArucoInvoke.DetectMarkers(_image, MarkerTypeToFind, outCorners, outIDs, _detectorParameters, null);
 
-
-              var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            path = Path.Combine(path, "Resources");
-            var path1 = Path.Combine(path, "BadSample.bmp");
-            Stream testfile = File.OpenRead(path1);
-
-            MemoryStream mStream = new MemoryStream();
-            testfile.CopyToAsync(mStream);
-            Thread.Sleep(1000);
-            Bitmap bmpImage = new Bitmap(mStream);
-
-
-
-
-
-            Emgu.CV.Image<Bgr, Byte> img = new Emgu.CV.Image<Bgr, Byte>(bmpImage);
-
-            var outArray = new VectorOfVectorOfPointF();
-            var idArray = new VectorOfInt();
-
-            DetectorParameters dectp = DetectorParameters.GetDefault();
-
-            var dict = new Dictionary(Dictionary.PredefinedDictionaryName.DictArucoOriginal);
-
-            Emgu.CV.Mat mat = new Emgu.CV.Mat();
-
-            Emgu.CV.Aruco.ArucoInvoke.DrawMarker(dict, 1, 200, mat);
-
-            var path2 = Path.Combine(path, "sample.bmp");
-            mat.Save(path2);
-
-            ArucoInvoke.DetectMarkers(img, dict, outArray, idArray, dectp);
-
-            var cornerarray = outArray.ToArrayOfArray();
-            PointF[] corners;
-
-            var ids = idArray.ToArray();
-            for (int i = 0; i<ids.Length;i++)
-            {
-                corners = cornerarray[i];
-                Console.WriteLine(i);
-                Console.WriteLine($"{corners[0].X}, {corners[0].Y} | {corners[1].X}, {corners[1].Y} | {corners[2].X}, {corners[2].Y} | {corners[3].X}, {corners[3].Y}");
-            }
-            Console.ReadLine();
-             */
-            Mat camera = new Mat();
-            camera.Create(3, 3, Emgu.CV.CvEnum.DepthType.Cv32F, 1);
-            camera.SetTo(new[] { 1039.7024546115156f, 0.0f, 401.9889542361556f, 0.0f, 1038.5598693279526f, 179.02511993572065f, 0.0f, 0.0f, 11.0f });
-
+            // then define all arguments for the estimatePoseSingleMarkers function call
+            float markerLength = 0.1f; // set the default markerLength which is usually given in the unit meter
+            Mat cameraMatrix = new Mat();
+            cameraMatrix.Create(3, 3, Emgu.CV.CvEnum.DepthType.Cv32F, 1);
+            cameraMatrix.SetTo(new[] { 1039.7024546115156f, 0.0f, 401.9889542361556f, 0.0f, 1038.5598693279526f, 179.02511993572065f, 0.0f, 0.0f, 11.0f });
             Mat distcoeffs = new Mat();
             distcoeffs.Create(1, 5, Emgu.CV.CvEnum.DepthType.Cv32F, 1);
             distcoeffs.SetTo(new[] { 0.1611302127599187f, 0.11645978908419138f, -0.020783847362699993f, -0.006686827095385685f, 0.0f });
-
             Mat rvecs = new Mat();
             Mat tvecs = new Mat();
 
-            Emgu.CV.Image<Bgr, Byte> _image = Utils.BitmapToImage.CreateImagefromBitmap(_testbitmap);
+            // now get all the pose in tvecs and all rotations in rvecs
+            Emgu.CV.Aruco.ArucoInvoke.EstimatePoseSingleMarkers(outCorners, markerLength, cameraMatrix, distcoeffs, rvecs, tvecs);
 
-            var _outCorners = new VectorOfVectorOfPointF();
-
-            var _outIDs = new VectorOfInt();
-
-            DetectorParameters _detectorParameters = DetectorParameters.GetDefault();
-
-            var _dict = new Dictionary(Dictionary.PredefinedDictionaryName.DictArucoOriginal);
-
-            // now do the evaluation
-            Emgu.CV.Aruco.ArucoInvoke.DetectMarkers(_image, _dict, _outCorners, _outIDs, _detectorParameters, null);
-            Emgu.CV.Aruco.ArucoInvoke.EstimatePoseSingleMarkers(_outCorners, 0.75f, camera, distcoeffs, rvecs, tvecs);
-
+            // now update the internal dictionary with the new data
+            UpdateInternalDictionary(outIDs, tvecs, rvecs);
         }
 
         /// <summary>
@@ -198,7 +150,7 @@ namespace TourBackend
         /// get the value true for their components isActive. Further the codeObjects should be updated with their
         /// current position and rotation as it was recognised in the FrameEvaluation Method
         /// </summary>
-        public void UpdateInternalDictionary(VectorOfInt _ids)
+        public void UpdateInternalDictionary(VectorOfInt _ids, Mat _positions, Mat _rotations)
         {
             // iterate through the whole internal dictionary, to set all CodeObject.isActive default to false
             foreach (var entry in codeObjectIDToCodeObject)
@@ -212,6 +164,9 @@ namespace TourBackend
                 if (codeObjectIDToCodeObject.ContainsKey(_ids[i]))
                 {
                     codeObjectIDToCodeObject[_ids[i]].isActive = true;
+
+                    // codeObjectIDToCodeObject[_ids[i]].position = _positions[i];
+                    // codeObjectIDToCodeObject[_ids[i]].rotation = _rotations[i];
                 }
             }
         }

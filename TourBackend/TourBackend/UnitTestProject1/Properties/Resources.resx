@@ -367,16 +367,4 @@
   <data name="TestVideo_080" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\testvideo_080.bmp;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="test_aruco_id_1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\test_aruco_id_1.bmp;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="test_aruco_id_1_2" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\test_aruco_id_1_2.bmp;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="test_aruco_id_1_2_3" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\test_aruco_id_1_2_3.bmp;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="test_aruco_none" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\test_aruco_none.bmp;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
 </root>
