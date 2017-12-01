@@ -41,11 +41,11 @@ namespace TourBackend
             return returnarray;
         }
 
-        public static byte[][][] GetPixelBytes(System.Drawing.Bitmap _bitmap, int width, int height) {
-            byte[][][] returnvalue = new Byte[width][][];
-            for (int i = 0; i<width; i++) {
-                returnvalue[i] = new Byte[height][];
-                for (int b = 0; b<height; b++) {
+        public static byte[][][] GetPixelBytes(System.Drawing.Bitmap _bitmap) {
+            byte[][][] returnvalue = new Byte[_bitmap.Width][][];
+            for (int i = 0; i<_bitmap.Width; i++) {
+                returnvalue[i] = new Byte[_bitmap.Height][];
+                for (int b = 0; b<_bitmap.Height; b++) {
                     returnvalue[i][b] = new Byte[3];
                     byte[] q = ColorOfPixelXY(_bitmap, i, b);
                     for (int s = 0; s<3; s++) {
@@ -56,22 +56,22 @@ namespace TourBackend
             return returnvalue;
         }
 
-        public static Image<Bgr, Byte> CreateMatfromArray(System.Drawing.Bitmap _bitmap, int width, int height) {
+        public static Image<Bgr, Byte> CreateImagefromBitmap(System.Drawing.Bitmap _bitmap) {
 
-            Image<Bgr, Byte> returnvalue = new Image<Bgr, byte>(width, height);
-            byte[][][] pixels = GetPixelBytes(_bitmap, width, height);
+            Image<Bgr, Byte> returnvalue = new Image<Bgr, byte>(_bitmap.Width, _bitmap.Height);
+            byte[][][] pixels = GetPixelBytes(_bitmap);
 
-            for (int i = 0; i < width; i++)
+            for (int i = 0; i < _bitmap.Width; i++)
             {
-                for (int a = 0; a < height; a++)
+                for (int a = 0; a < _bitmap.Height; a++)
                 {
 
                     byte b = pixels[i][a][0];
                     byte g = pixels[i][a][1];
                     byte r = pixels[i][a][2];
-                    returnvalue.Data[i, a, 0] = b;
-                    returnvalue.Data[i, a, 1] = g;
-                    returnvalue.Data[i, a, 2] = r;
+                    returnvalue.Data[a, i, 0] = b;
+                    returnvalue.Data[a, i, 1] = g;
+                    returnvalue.Data[a, i, 2] = r;
 
                 }
             }

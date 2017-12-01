@@ -63,6 +63,26 @@ namespace UnitTestProject1.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Byte[].
         /// </summary>
+        internal static byte[] braun {
+            get {
+                object obj = ResourceManager.GetObject("braun", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Ressource vom Typ System.Byte[].
+        /// </summary>
+        internal static byte[] rot {
+            get {
+                object obj = ResourceManager.GetObject("rot", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Ressource vom Typ System.Byte[].
+        /// </summary>
         internal static byte[] test_aruco_id_1 {
             get {
                 object obj = ResourceManager.GetObject("test_aruco_id_1", resourceCulture);
