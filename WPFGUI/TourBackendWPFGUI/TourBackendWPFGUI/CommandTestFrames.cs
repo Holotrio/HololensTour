@@ -47,11 +47,11 @@ namespace TourBackend
 
         public Bitmap GetCurrentFrame()
         {
-            return null;
+            return frames[currentIdx];
         }
 
         public void Reset() {
-
+            currentIdx = 0;
         }
 
 

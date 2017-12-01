@@ -36,8 +36,16 @@ namespace TourBackendWPFGUI
         public Dictionary<int, CodeObject> CopyOfDict;// = new Dictionary<string, CodeObject>();
         public System.Int64 lasttimestamp;
 
+        public CameraFeedSyncObject cameraFeedSyncObject;
+        public Bitmap bitmap;
+
+        //public Framework framework;
+
         public CommandTestFrames frames;
         public bool framesactivated = false;
+        
+
+
 
         public MainWindow()
         {/*
@@ -79,6 +87,7 @@ namespace TourBackendWPFGUI
 
         }
 
+        //ToDo change to Event of changed Syncobject
         public void GetTourState()
         {
             if (syncObject.timestamp != lasttimestamp)
@@ -132,9 +141,15 @@ namespace TourBackendWPFGUI
             {
                 //here choose your file
                 //Framebox.Source = new BitmapImage(new Uri(openFileDialog.FileName));
-                Framebox.Source = BitmapToImageSource(new Bitmap(openFileDialog.FileName));
+                bitmap = new Bitmap(openFileDialog.FileName);
+                Framebox.Source = BitmapToImageSource(bitmap);
                 frames = new CommandTestFrames(System.IO.Directory.GetFiles(System.IO.Path.GetDirectoryName(openFileDialog.FileName)).Where(m => m.ToUpper().EndsWith("JPG") || m.ToUpper().EndsWith("BMP") || m.ToUpper().EndsWith("GIF") || m.ToUpper().EndsWith("PNG")));
                 framesactivated = true;
+                UpdateCamerFeedSyncObject(openFileDialog.FileName, bitmap);
+
+                //frameWork = new FrameWork(syncObject, cfSyncObject, markers);
+                //frameWork.Initialize();
+
             }
         }
 
@@ -187,7 +202,9 @@ namespace TourBackendWPFGUI
         {
             if (framesactivated && frames.length != 0)
             {
-                Framebox.Source = BitmapToImageSource(frames.ReturnAndSetNextFrame());
+                bitmap = frames.ReturnAndSetNextFrame();
+                Framebox.Source = BitmapToImageSource(bitmap);
+                UpdateCamerFeedSyncObject("nextframe_id", bitmap);
             }
         }
 
@@ -195,8 +212,28 @@ namespace TourBackendWPFGUI
         {
             if (framesactivated && frames.length != 0)
             {
-                Framebox.Source = BitmapToImageSource(frames.ReturnAndSetPreviousFrame());
+                Bitmap bitmap = frames.ReturnAndSetPreviousFrame();
+                Framebox.Source = BitmapToImageSource(bitmap);
+                UpdateCamerFeedSyncObject("previousframe_id", bitmap);
             }
+        }
+
+        private void Restart_Click(object sender, RoutedEventArgs e)
+        {
+            if (framesactivated && frames.length != 0)
+            {
+                frames.Reset();
+                Bitmap bitmap = frames.GetCurrentFrame();
+                Framebox.Source = BitmapToImageSource(bitmap);
+                UpdateCamerFeedSyncObject("firstframe_id", bitmap);
+            }
+        }
+
+        public void UpdateCamerFeedSyncObject(string _id, Bitmap _bitmap)
+        {
+            CameraFeedSyncObject cameraFeedSyncObject = new CameraFeedSyncObject(_id);
+            cameraFeedSyncObject.bitmap = bitmap;
+            cameraFeedSyncObject.UpdateFrame();
         }
     }
 }

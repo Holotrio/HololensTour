@@ -105,7 +105,8 @@
                 Width="120"
                 Height="30"
                 />
-        <Button Content="Restart" 
+        <Button Name="Restart"
+                Content="Restart" 
                 HorizontalAlignment="Center" 
                 Grid.Row="1"
                 Grid.RowSpan="1"
@@ -113,6 +114,7 @@
                 Grid.ColumnSpan="2" 
                 Width="120"
                 Height="30"
+                Click="Restart_Click"
                 />
 
         <DockPanel Grid.Column="0" Grid.ColumnSpan="8" Grid.Row="0" Grid.RowSpan="1" Height="20" VerticalAlignment="Top">
