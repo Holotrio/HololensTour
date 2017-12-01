@@ -20,7 +20,7 @@ namespace TourBackend
         // this dictionary is created when the recognition manager gets initialized by the controlactor and
         // it stays static meaning that the keys to value relations will not change. The only thing that changes
         // are the codeObject itself id est their properties.
-        public Dictionary<int,CodeObject> codeObjectIDToCodeObject = new Dictionary<int, CodeObject>();
+        public Dictionary<int, CodeObject> codeObjectIDToCodeObject = new Dictionary<int, CodeObject>();
         // here is the constructor
         public RecognitionManager(string id, Dictionary<int, CodeObject> _dict)
         {
@@ -44,7 +44,7 @@ namespace TourBackend
                         // if and only if his isActive == true
                         foreach (var entry in codeObjectIDToCodeObject)
                         {
-                            if(entry.Value.isActive == true)
+                            if (entry.Value.isActive == true)
                             {
                                 returnDict.Add(entry.Key, entry.Value);
                             }
@@ -101,7 +101,7 @@ namespace TourBackend
                     {
                         // do the work here with the recognition of the frame
                         FrameEvaluation(n.bitmap);
-                   
+
                         // after the successfull evaluation respond to the control Actor
                         var _respondMsg = new RespondNewFrameArrived(n.id);
                         context.Sender.Tell(_respondMsg);
@@ -117,24 +117,67 @@ namespace TourBackend
         /// </summary>
         public void FrameEvaluation(Bitmap _bitmap)
         {
-            // use the Function from Emgu.Cv.Aruco.ArucoInvoke for the detection: 
-            // define the frame parameters
-            const int _width = 2160; // Pixelwidth
-            const int _height = 1440; // Pixelheight
-            const float _markerLength = 0.1f; // usually the unit is meter
-            // create the camera Matrix and the distortion coefficients from https://github.com/qian256/HoloLensCamCalib/blob/master/near/hololens896x504.yaml
-            VectorOfFloat _cameraMatrix = new VectorOfFloat();
-            float [] _camMa1 = { 1039.7024546115156f, 0.0f, 401.9889542361556f };
-            float [] _camMa2 = { 0.0f, 1038.5598693279526f, 179.02511993572065f };
-            float[] _camMa3 = { 0.0f, 0.0f, 11.0f };
-            _cameraMatrix.Push(_camMa1);
-            _cameraMatrix.Push(_camMa2);
-            _cameraMatrix.Push(_camMa3);
 
-            float[] _distCo = { 0.1611302127599187f, 0.11645978908419138f, -0.020783847362699993f, -0.006686827095385685f, 0.0f};
-            VectorOfFloat _distortionCoefficients = new VectorOfFloat(_distCo);
+            /*
+             To Kiser with love
 
-            Emgu.CV.Image<Bgr, Byte> _image = Utils.BitmapToImage.CreateImagefromBitmap(_bitmap);
+
+              var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            path = Path.Combine(path, "Resources");
+            var path1 = Path.Combine(path, "BadSample.bmp");
+            Stream testfile = File.OpenRead(path1);
+
+            MemoryStream mStream = new MemoryStream();
+            testfile.CopyToAsync(mStream);
+            Thread.Sleep(1000);
+            Bitmap bmpImage = new Bitmap(mStream);
+
+
+
+
+
+            Emgu.CV.Image<Bgr, Byte> img = new Emgu.CV.Image<Bgr, Byte>(bmpImage);
+
+            var outArray = new VectorOfVectorOfPointF();
+            var idArray = new VectorOfInt();
+
+            DetectorParameters dectp = DetectorParameters.GetDefault();
+
+            var dict = new Dictionary(Dictionary.PredefinedDictionaryName.DictArucoOriginal);
+
+            Emgu.CV.Mat mat = new Emgu.CV.Mat();
+
+            Emgu.CV.Aruco.ArucoInvoke.DrawMarker(dict, 1, 200, mat);
+
+            var path2 = Path.Combine(path, "sample.bmp");
+            mat.Save(path2);
+
+            ArucoInvoke.DetectMarkers(img, dict, outArray, idArray, dectp);
+
+            var cornerarray = outArray.ToArrayOfArray();
+            PointF[] corners;
+
+            var ids = idArray.ToArray();
+            for (int i = 0; i<ids.Length;i++)
+            {
+                corners = cornerarray[i];
+                Console.WriteLine(i);
+                Console.WriteLine($"{corners[0].X}, {corners[0].Y} | {corners[1].X}, {corners[1].Y} | {corners[2].X}, {corners[2].Y} | {corners[3].X}, {corners[3].Y}");
+            }
+            Console.ReadLine();
+             */
+            Mat camera = new Mat();
+            camera.Create(3, 3, Emgu.CV.CvEnum.DepthType.Cv32F, 1);
+            camera.SetTo(new[] { 1039.7024546115156f, 0.0f, 401.9889542361556f, 0.0f, 1038.5598693279526f, 179.02511993572065f, 0.0f, 0.0f, 11.0f });
+
+            Mat distcoeffs = new Mat();
+            distcoeffs.Create(1, 5, Emgu.CV.CvEnum.DepthType.Cv32F, 1);
+            distcoeffs.SetTo(new[] { 0.1611302127599187f, 0.11645978908419138f, -0.020783847362699993f, -0.006686827095385685f, 0.0f });
+
+            Mat rvecs = new Mat();
+            Mat tvecs = new Mat();
+
+            Emgu.CV.Image<Bgr, Byte> _image = Utils.BitmapToImage.CreateImagefromBitmap(_testbitmap);
 
             var _outCorners = new VectorOfVectorOfPointF();
 
@@ -146,13 +189,8 @@ namespace TourBackend
 
             // now do the evaluation
             Emgu.CV.Aruco.ArucoInvoke.DetectMarkers(_image, _dict, _outCorners, _outIDs, _detectorParameters, null);
-            /*  *** here we should also have the conversion of the information from the corner information to the actual
-             * rotation and position of the marker *** */
-            VectorOfPoint3D32F _rvecs = new VectorOfPoint3D32F();
-            VectorOfPoint3D32F _tvecs = new VectorOfPoint3D32F();
-            Emgu.CV.Aruco.ArucoInvoke.EstimatePoseSingleMarkers(_outCorners, _markerLength, _cameraMatrix, _distortionCoefficients,  _rvecs,  _tvecs);
-            // now we have done the evaluation of the frame and now we want to update the dictionary with the current data
-            UpdateInternalDictionary(_outIDs);
+            Emgu.CV.Aruco.ArucoInvoke.EstimatePoseSingleMarkers(_outCorners, 0.75f, camera, distcoeffs, rvecs, tvecs);
+
         }
 
         /// <summary>
