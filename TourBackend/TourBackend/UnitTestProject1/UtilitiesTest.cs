@@ -3,6 +3,11 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using System.Reflection;
 using System.Drawing;
+using System.Collections.Generic;
+using Emgu.CV.Structure;
+using Emgu.CV.Util;
+using Emgu.CV.Aruco;
+using Emgu.CV;
 
 namespace TourBackend
 {
@@ -292,9 +297,122 @@ namespace TourBackend
             Assert.AreEqual(cmnd.currentIdx, 0);
         }
     }
+
+
     [TestClass]
     public class HelpForTesting
     {
+        [TestMethod]
+        public void Create_New_Marker_actually_creates_Bitmap_successfully()
+        {
+            Utils.HelpForTesting.CreateMarkerWithID(1);
+        }
 
+        /// <summary>
+        /// the idea here is just to create an dictionary with codeObjects to make it easier and more
+        /// readable to test. Cause in every test you have to create the recognition Manager and therefore
+        /// you have to make a dictionary
+        /// </summary>
+        [TestMethod]
+        public void Create_New_Dictionary_successfully()
+        {
+            // check if an empty dictionary gets created correctly
+            Dictionary<int,CodeObject> empty = Utils.HelpForTesting.CreateDictionaryForInitialization(0);
+            Assert.AreEqual(0, empty.Count);
+
+            // check if a dictionary of 10 codeObjects gets created correctly
+            Dictionary<int, CodeObject> tenCO = Utils.HelpForTesting.CreateDictionaryForInitialization(10);
+            Assert.AreEqual(10, tenCO.Count);
+
+            // check if a dictionary of 3 codeObjects gets created correctly and takes on the right values
+            Dictionary<int, CodeObject> threeCO = Utils.HelpForTesting.CreateDictionaryForInitialization(3);
+            Assert.AreEqual(3, threeCO.Count);
+            for(int i = 0; i < threeCO.Count; ++i)
+            {
+                Assert.AreEqual(true, threeCO.ContainsKey(i + 1));
+                Assert.AreEqual(false, threeCO[i+1].isActive);
+                Assert.AreEqual(1f + i, threeCO[i+1].position[0]);
+                Assert.AreEqual(2f + i, threeCO[i+1].position[1]);
+                Assert.AreEqual(3f + i, threeCO[i+1].position[2]);
+                Assert.AreEqual(0.1f + i, threeCO[i+1].rotation[0]);
+                Assert.AreEqual(0.1f + i, threeCO[i+1].rotation[1]);
+                Assert.AreEqual(0.1f + i, threeCO[i+1].rotation[2]);
+            }
+        }
+
+        /// <summary>
+        /// this test is here to try the functions from emguCV out and see what types are the arguments
+        /// and so on. Just to get a better feeling of what exactly the functions take and return
+        /// </summary>
+        [TestMethod]
+        public void TestEmguCVEstimatePoseSingleMarker()
+        {
+            // first get an bitmap
+            var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            path = Path.Combine(path, "Resources");
+            path = Path.Combine(path, "SampleScene.bmp");
+            Stream testfile = File.OpenRead(path);
+            var _testbitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(testfile);
+
+            // then define the arguments for the emguCV functions
+
+            // first set all arguments for the DetectMarkers function call
+            Emgu.CV.Image<Bgr, Byte> _image = Utils.BitmapToImage.CreateImagefromBitmap(_testbitmap);
+            var MarkerTypeToFind = new Dictionary(Dictionary.PredefinedDictionaryName.DictArucoOriginal);
+            var outCorners = new VectorOfVectorOfPointF();
+            var outIDs = new VectorOfInt();
+            DetectorParameters _detectorParameters = DetectorParameters.GetDefault();
+
+            // now detect the markers in the image bitmap
+            Emgu.CV.Aruco.ArucoInvoke.DetectMarkers(_image, MarkerTypeToFind, outCorners, outIDs, _detectorParameters, null);
+
+            // then define all arguments for the estimatePoseSingleMarkers function call
+            float markerLength = 0.1f; // set the default markerLength which is usually given in the unit meter
+            Mat cameraMatrix = new Mat();
+            cameraMatrix.Create(3, 3, Emgu.CV.CvEnum.DepthType.Cv32F, 1);
+            cameraMatrix.SetTo(new[] { 1039.7024546115156f, 0.0f, 401.9889542361556f, 0.0f, 1038.5598693279526f, 179.02511993572065f, 0.0f, 0.0f, 11.0f });
+            Mat distcoeffs = new Mat();
+            distcoeffs.Create(1, 5, Emgu.CV.CvEnum.DepthType.Cv32F, 1);
+            distcoeffs.SetTo(new[] { 0.1611302127599187f, 0.11645978908419138f, -0.020783847362699993f, -0.006686827095385685f, 0.0f });
+            Mat rvecs = new Mat();
+            Mat tvecs = new Mat();
+
+            // now get all the pose in tvecs and all rotations in rvecs
+            Emgu.CV.Aruco.ArucoInvoke.EstimatePoseSingleMarkers(outCorners, markerLength, cameraMatrix, distcoeffs, rvecs, tvecs);
+
+            // here we extract the translation vector out of the tvecs mat return value
+            // which stored the values as doubles in the mat
+            double[] _tvecs = new double[3];            
+            tvecs.CopyTo<double>(_tvecs);
+            for(int i = 0; i < _tvecs.Length; ++i)
+            {
+                Console.WriteLine("tvecs = " + _tvecs[i]);
+            }
+
+            // here we extract the roation vector out of the rvecs mat return value
+            // which stored the values as doubles in the mat
+            double[] _rvecs = new double[3];
+            rvecs.CopyTo<double>(_rvecs);
+            for (int i = 0; i < _rvecs.Length; ++i)
+            {
+                Console.WriteLine("rvecs = " + _rvecs[i]);
+            }
+
+            // here we create a rotation matrix out of the rotation vector, it is this a 3x3 matrix with
+            // 9 elements and it is like: rotMat(x,y) = _rotmat(x+y-2)
+            // which stored the values as doubles in the mat
+            double[] _rotMat = new double[9];
+            Mat rotMat = new Mat();
+            Emgu.CV.CvInvoke.Rodrigues(rvecs, rotMat, null);
+            rotMat.CopyTo<double>(_rotMat);
+            for (int i = 0; i < _rotMat.Length; ++i)
+            {
+                double help = i / 3;
+                int index_x = (int) Math.Floor(help);
+                int index_y = i % 3;
+                Console.WriteLine("rotMat(" + index_x + ", " + index_y + ") = " + _rotMat[i]);
+            }
+
+        }
     }
 }

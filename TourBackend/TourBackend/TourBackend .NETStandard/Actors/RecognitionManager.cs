@@ -152,6 +152,9 @@ namespace TourBackend
         /// </summary>
         public void UpdateInternalDictionary(VectorOfInt _ids, Mat _positions, Mat _rotations)
         {
+            // first get the data out of the Mats
+              // float[,] positions = new float[_ids.Size , 3];
+
             // iterate through the whole internal dictionary, to set all CodeObject.isActive default to false
             foreach (var entry in codeObjectIDToCodeObject)
             {
@@ -165,7 +168,11 @@ namespace TourBackend
                 {
                     codeObjectIDToCodeObject[_ids[i]].isActive = true;
 
-                    // codeObjectIDToCodeObject[_ids[i]].position = _positions[i];
+
+
+                    // codeObjectIDToCodeObject[_ids[i]].position[0];
+
+
                     // codeObjectIDToCodeObject[_ids[i]].rotation = _rotations[i];
                 }
             }

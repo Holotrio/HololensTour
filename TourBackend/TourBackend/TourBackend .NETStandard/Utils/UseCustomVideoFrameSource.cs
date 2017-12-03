@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 using Proto;
 using Emgu.CV;
 using Emgu.CV.Structure;
+using Emgu.CV.Aruco;
+using System.Reflection;
+using System.Drawing;
+using static System.Drawing.Bitmap;
 
 namespace TourBackend
 {
@@ -99,28 +103,60 @@ namespace TourBackend
             public static Dictionary<int, CodeObject> CreateDictionaryForInitialization(int _numberOfCodeObjects)
             {
                 int[] ids = new int[_numberOfCodeObjects];
-                float[][] positions = new float[_numberOfCodeObjects][];
-                float[][] rotations = new float[_numberOfCodeObjects][];
+                float[ , ] positions = new float[_numberOfCodeObjects, 3];
+                float[ , ] rotations = new float[_numberOfCodeObjects, 3];
                 const bool isActive = false;
                 Dictionary<int, CodeObject> returnDict = new Dictionary<int, CodeObject>();
 
                 for (int i = 0; i < _numberOfCodeObjects; ++i)
                 {
-                    ids[i] = i;
-                    positions[i][0] = 1f + i;
-                    positions[i][1] = 2f + i;
-                    positions[i][2] = 3f + i;
-                    rotations[i][0] = 0.1f + i;
-                    rotations[i][1] = 0.1f + i;
-                    rotations[i][2] = 0.1f + i;
+                    ids[i] = i + 1;
+                    positions[i , 0]= 1f + i;
+                    positions[i , 1] = 2f + i;
+                    positions[i , 2] = 3f + i;
+                    rotations[i, 0] = 0.1f + i;
+                    rotations[i, 1] = 0.1f + i;
+                    rotations[i, 2] = 0.1f + i;
                 }
 
                 for (int i = 0; i < _numberOfCodeObjects; ++i)
                 {
-                    CodeObject codeObject = new CodeObject(ids[i], positions[i], rotations[i], isActive);
+                    float[] position = new float[3];
+                    position[0] = positions[i, 0];
+                    position[1] = positions[i, 1];
+                    position[2] = positions[i, 2];
+
+                    float[] rotation = new float[3];
+                    rotation[0] = rotations[i, 0];
+                    rotation[1] = rotations[i, 1];
+                    rotation[2] = rotations[i, 2];
+
+                    CodeObject codeObject = new CodeObject(ids[i], position, rotation, isActive);
                     returnDict.Add(codeObject.id, codeObject);
                 }
                 return returnDict;
+            }
+
+            public static void CreateMarkerWithID(int _ID)
+            {
+                // define the path where the marker bitmap should be stored
+                var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                path = Path.Combine(path, "Resources");
+
+                // define the type of the Aruco Code with the dictionary
+                var typeOfArucoCode = new  Dictionary(Dictionary.PredefinedDictionaryName.DictArucoOriginal);
+
+                // create the mat where the marker is firstly stored
+                Emgu.CV.Mat arucoCodeAsMat = new Emgu.CV.Mat();
+
+                // draw the marker into the mat
+                Emgu.CV.Aruco.ArucoInvoke.DrawMarker(typeOfArucoCode, 1, 200, arucoCodeAsMat);
+
+
+                // specifiy the filename of the created marker and store it
+                string filename = "ArucoCode_with_ID_" + _ID + ".bmp";
+                var pathTarget = Path.Combine(path,filename);
+                arucoCodeAsMat.Save(pathTarget);
             }
         }
     }
