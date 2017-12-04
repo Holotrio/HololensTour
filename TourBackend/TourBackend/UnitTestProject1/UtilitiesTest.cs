@@ -329,11 +329,56 @@ namespace TourBackend
                 Assert.AreEqual(1f + i, threeCO[i+1].position[0]);
                 Assert.AreEqual(2f + i, threeCO[i+1].position[1]);
                 Assert.AreEqual(3f + i, threeCO[i+1].position[2]);
-                Assert.AreEqual(0.1f + i, threeCO[i+1].rotation[0]);
-                Assert.AreEqual(0.1f + i, threeCO[i+1].rotation[1]);
-                Assert.AreEqual(0.1f + i, threeCO[i+1].rotation[2]);
+                for(int r = 0; r < 9; ++r)
+                {
+                    Assert.AreEqual(0.1f + i / 4, threeCO[i + 1].rotation[r]);
+                }
             }
         }
+
+        [TestMethod]
+        public void Saving_Translations_of_Bitmap_File_works_Correctly()
+        {
+            double [,] testArray = Utils.HelpForTesting.GetTranslationsOfBitmapFile("ArucoCode_ID_1_8.bmp");
+            double e = 0.0000000001d; // is the error we accept for the comparison of two double numbers
+
+            // the values are from the test "TestEmguCVEstimatePoseSingleMarker" with the corresponding file
+            Assert.AreEqual(true, System.Math.Abs(testArray[0, 0] - 0.0737796277430287d) < e);
+            Assert.AreEqual(true, System.Math.Abs(testArray[0, 1] - 0.227391492179383d) < e);
+            Assert.AreEqual(true, System.Math.Abs(testArray[0, 2] - 0.468146142991522d) < e);
+            Assert.AreEqual(true, System.Math.Abs(testArray[1, 0] - 0.240908013277061d) < e);
+            Assert.AreEqual(true, System.Math.Abs(testArray[1, 1] - 0.144436011162901d) < e);
+            Assert.AreEqual(true, System.Math.Abs(testArray[1, 2] - 0.289776788475129d) < e);
+        }
+
+        [TestMethod]
+        public void Saving_RotationMatrices_of_Bitmap_File_works_Correctly()
+        {
+            double[,] testArray = Utils.HelpForTesting.GetRotationMatricesOfBitmapFile("ArucoCode_ID_1_8.bmp");
+            double e = 0.0000000001d; // is the error we accept for the comparison of two double numbers
+
+            // the values are from the test "TestEmguCVEstimatePoseSingleMarker" with the corresponding file
+            Assert.AreEqual(true, System.Math.Abs(testArray[0, 0] - 0.522632902748552d) < e);
+            Assert.AreEqual(true, System.Math.Abs(testArray[0, 1] - 0.851647442384075d) < e);
+            Assert.AreEqual(true, System.Math.Abs(testArray[0, 2] - 0.0393888670221022d) < e);
+            Assert.AreEqual(true, System.Math.Abs(testArray[0, 3] - 0.844192492076394d) < e);
+            Assert.AreEqual(true, System.Math.Abs(testArray[0, 4] + 0.523408391546381d) < e);
+            Assert.AreEqual(true, System.Math.Abs(testArray[0, 5] - 0.115683585614717d) < e);
+            Assert.AreEqual(true, System.Math.Abs(testArray[0, 6] - 0.119138093347466d) < e);
+            Assert.AreEqual(true, System.Math.Abs(testArray[0, 7] + 0.0272082623387261d) < e);
+            Assert.AreEqual(true, System.Math.Abs(testArray[0, 8] + 0.992504823753536d) < e);
+            Assert.AreEqual(true, System.Math.Abs(testArray[1, 0] + 0.5970099450151d) < e);
+            Assert.AreEqual(true, System.Math.Abs(testArray[1, 1] - 0.755516201527125d) < e);
+            Assert.AreEqual(true, System.Math.Abs(testArray[1, 2] - 0.26976729746782d) < e);
+            Assert.AreEqual(true, System.Math.Abs(testArray[1, 3] - 0.800742084957059d) < e);
+            Assert.AreEqual(true, System.Math.Abs(testArray[1, 4] - 0.581695323014744d) < e);
+            Assert.AreEqual(true, System.Math.Abs(testArray[1, 5] - 0.142977846400742d) < e);
+            Assert.AreEqual(true, System.Math.Abs(testArray[1, 6] + 0.0489002958241404d) < e);
+            Assert.AreEqual(true, System.Math.Abs(testArray[1, 7] - 0.301373224445698d) < e);
+            Assert.AreEqual(true, System.Math.Abs(testArray[1, 8] + 0.952251511238241d) < e);
+        }
+
+
 
         /// <summary>
         /// this test is here to try the functions from emguCV out and see what types are the arguments
@@ -345,7 +390,7 @@ namespace TourBackend
             // first get an bitmap
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path = Path.Combine(path, "Resources");
-            path = Path.Combine(path, "ArucoCode_ID_1_2_3_7_10.bmp");
+            path = Path.Combine(path, "ArucoCode_ID_1_8.bmp");
             Stream testfile = File.OpenRead(path);
             var _testbitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(testfile);
 

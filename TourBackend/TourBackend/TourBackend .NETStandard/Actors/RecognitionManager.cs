@@ -184,13 +184,12 @@ namespace TourBackend
                         }
                     }
                     
-                    /*
                     // and finally update the roation matrix of the codeObject
                     if(rvecsRows == idSize)
                     {
                         // first create the rotation matrix still as a Mat
                         Mat _rotMat = new Mat();
-                        Emgu.CV.CvInvoke.Rodrigues(_rotationVectors.Row(i), _rotMat, null);
+                        Emgu.CV.CvInvoke.Rodrigues(_rotationVectors.Row(i), _rotMat, null);                         
                         // then get the data out of the Mat
                         double[] rotMat = new double[9];
                         _rotMat.CopyTo<double>(rotMat);
@@ -198,10 +197,8 @@ namespace TourBackend
                         for (int r = 0; r < rotMat.Length; ++r)
                         {
                             codeObjectIDToCodeObject[_ids[i]].rotation[r] = rotMat[r];
-                        }
-                    }
-                    */
-                    
+                        }                        
+                    }                    
                 }
                 else
                 {
