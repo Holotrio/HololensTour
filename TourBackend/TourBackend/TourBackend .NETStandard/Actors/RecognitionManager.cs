@@ -168,8 +168,6 @@ namespace TourBackend
                 {
                     codeObjectIDToCodeObject[_ids[i]].isActive = true;
 
-
-
                     // codeObjectIDToCodeObject[_ids[i]].position[0];
 
 

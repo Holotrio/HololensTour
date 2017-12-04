@@ -192,7 +192,7 @@ namespace TourBackend
             string _messageID = "NewFrameArrived";
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path = Path.Combine(path, "Resources");
-            path = Path.Combine(path, "ArucoCode_Nothing_in_there.bmp");
+            path = Path.Combine(path, "ArucoCode_No_Marker.bmp");
             Stream testfile = File.OpenRead(path);
             var _testbitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(testfile);
 
@@ -200,7 +200,7 @@ namespace TourBackend
             var msg = new NewFrameArrived(_messageID, _testbitmap);
 
             // now send this message to the recognitionManager and get the answer in the response variable
-            var respondNewFrameArrived = await _pidTestRecognitionManager.RequestAsync<RespondNewFrameArrived>(msg, TimeSpan.FromSeconds(1));
+            var respondNewFrameArrived = await _pidTestRecognitionManager.RequestAsync<RespondNewFrameArrived>(msg, TimeSpan.FromSeconds(10));
 
             // now check if we get the right answer meaning the right message id
             Assert.AreEqual(respondNewFrameArrived.messageID, _messageID);
@@ -239,7 +239,7 @@ namespace TourBackend
             var msg = new NewFrameArrived(_messageID, _testbitmap);
 
             // now send this message to the recognitionManager and get the answer in the response variable
-            var respondNewFrameArrived = await _pidTestRecognitionManager.RequestAsync<RespondNewFrameArrived>(msg, TimeSpan.FromSeconds(1));
+            var respondNewFrameArrived = await _pidTestRecognitionManager.RequestAsync<RespondNewFrameArrived>(msg, TimeSpan.FromSeconds(10));
 
             // now check if we get the right answer meaning the right message id
             Assert.AreEqual(respondNewFrameArrived.messageID, _messageID);
@@ -261,9 +261,87 @@ namespace TourBackend
         /// defined message: RespondNewFrameArrived to signalise that all works perfectly fine.
         /// </summary>
         [TestMethod]
+        public async Task RecognitionManager_evaluates_one_frame_with_two_markers_correctly()
+        {
+            // then create the testrecognition manager and the dictionary with all the initialized markers in it. 
+            // But all have isActive = false...
+            Dictionary<int, CodeObject> initialDict = Utils.HelpForTesting.CreateDictionaryForInitialization(10);
+            var _propsTestRecognitionManager = Actor.FromProducer(() => new RecognitionManager("RecognitionManager", initialDict));
+            var _pidTestRecognitionManager = Actor.Spawn(_propsTestRecognitionManager);
+
+            // create a new object of the message type NewFrameArrived
+            string _messageID = "NewFrameArrived";
+            var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            path = Path.Combine(path, "Resources");
+            path = Path.Combine(path, "ArucoCode_ID_1_8.bmp");
+            Stream testfile = File.OpenRead(path);
+            var _testbitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(testfile);
+
+            // now we are able to create the message
+            var msg = new NewFrameArrived(_messageID, _testbitmap);
+
+            // now send this message to the recognitionManager and get the answer in the response variable
+            var respondNewFrameArrived = await _pidTestRecognitionManager.RequestAsync<RespondNewFrameArrived>(msg, TimeSpan.FromSeconds(10));
+
+            // now check if we get the right answer meaning the right message id
+            Assert.AreEqual(respondNewFrameArrived.messageID, _messageID);
+
+            // now check with the request all if the right changes were made in the dictionary
+            var requestAll = new RequestAllVirtualObjects("Request", TimeSpan.FromSeconds(1));
+            var respondRequestAll = await _pidTestRecognitionManager.RequestAsync<RespondRequestAllVirtualObjects>(requestAll, TimeSpan.FromSeconds(1));
+            Assert.AreEqual("Request", respondRequestAll.messageID);
+            Assert.AreEqual(2, respondRequestAll.newCodeObjectIDToCodeObject.Count);
+            Assert.AreEqual(true, respondRequestAll.newCodeObjectIDToCodeObject.ContainsKey(1));
+            Assert.AreEqual(true, respondRequestAll.newCodeObjectIDToCodeObject.ContainsKey(8));
+
+            // Remark: the position and rotation should be tested as well, that they are in the dict as we wanna them to have
+        }
+
+        /// <summary>
+        /// the idea here is that if the controlActor sends the message NewFrameArrived to the RecognitionManager (=RM), then 
+        /// the RM makes the evaluation of the frames and After the that he should update his values in the
+        /// dictionary CodeObjectIDToCodeObject. Finally the RM should respond to the controlActor with the corresponding 
+        /// defined message: RespondNewFrameArrived to signalise that all works perfectly fine.
+        /// </summary>
+        [TestMethod]
         public async Task RecognitionManager_evaluates_one_frame_with_multiple_markers_correctly()
         {
-            Assert.AreEqual(true, false);
+            // then create the testrecognition manager and the dictionary with all the initialized markers in it. 
+            // But all have isActive = false...
+            Dictionary<int, CodeObject> initialDict = Utils.HelpForTesting.CreateDictionaryForInitialization(10);
+            var _propsTestRecognitionManager = Actor.FromProducer(() => new RecognitionManager("RecognitionManager", initialDict));
+            var _pidTestRecognitionManager = Actor.Spawn(_propsTestRecognitionManager);
+
+            // create a new object of the message type NewFrameArrived
+            string _messageID = "NewFrameArrived";
+            var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            path = Path.Combine(path, "Resources");
+            path = Path.Combine(path, "ArucoCode_ID_1_2_3_7_10.bmp");
+            Stream testfile = File.OpenRead(path);
+            var _testbitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(testfile);
+
+            // now we are able to create the message
+            var msg = new NewFrameArrived(_messageID, _testbitmap);
+
+            // now send this message to the recognitionManager and get the answer in the response variable
+            var respondNewFrameArrived = await _pidTestRecognitionManager.RequestAsync<RespondNewFrameArrived>(msg, TimeSpan.FromSeconds(10));
+
+            // now check if we get the right answer meaning the right message id
+            Assert.AreEqual(respondNewFrameArrived.messageID, _messageID);
+
+            // now check with the request all if the right changes were made in the dictionary
+            var requestAll = new RequestAllVirtualObjects("Request", TimeSpan.FromSeconds(1));
+            var respondRequestAll = await _pidTestRecognitionManager.RequestAsync<RespondRequestAllVirtualObjects>(requestAll, TimeSpan.FromSeconds(1));
+            Assert.AreEqual("Request", respondRequestAll.messageID);
+            Assert.AreEqual(5, respondRequestAll.newCodeObjectIDToCodeObject.Count);
+            Assert.AreEqual(true, respondRequestAll.newCodeObjectIDToCodeObject.ContainsKey(1));
+            Assert.AreEqual(true, respondRequestAll.newCodeObjectIDToCodeObject.ContainsKey(2));
+            Assert.AreEqual(true, respondRequestAll.newCodeObjectIDToCodeObject.ContainsKey(3));
+            Assert.AreEqual(true, respondRequestAll.newCodeObjectIDToCodeObject.ContainsKey(7));
+            Assert.AreEqual(true, respondRequestAll.newCodeObjectIDToCodeObject.ContainsKey(10));
+
+
+            // Remark: the position and rotation should be tested as well, that they are in the dict as we wanna them to have
         }
     }
 }
