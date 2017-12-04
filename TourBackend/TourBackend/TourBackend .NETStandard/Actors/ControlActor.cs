@@ -9,7 +9,10 @@ using System.Diagnostics;
 
 namespace TourBackend
 {
-
+    /// <summary>
+    /// Root initilization class of the whole system.
+    /// It's constructor is called with all information that is needed for the system to work.
+    /// </summary>
     public class FrameWork {
         /* markers is the array which is given to the framework by the constructor.
             It contains the IDs of the markers which are to be recognized */
@@ -24,7 +27,12 @@ namespace TourBackend
         private SyncObject syncobj;
         private CameraFeedSyncObject video;
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="_syncobj">SyncObject as defined in </param>
+        /// <param name="_video"></param>
+        /// <param name="_markers"></param>
         public FrameWork(SyncObject _syncobj, CameraFeedSyncObject _video, CodeObject[] _markers) {
             syncobj = _syncobj;
             video = _video;

@@ -54,9 +54,7 @@ namespace TourBackend
 
         }
 
-
-        // Test if CameraFeedSyncObject fires an event FramUpdated and CameraFeedActor listens to it and sends NewFrameArrived to ctrlpid
-
+        /// <summary>Test if CameraFeedSyncObject fires an event FramUpdated and CameraFeedActor listens to it and sends NewFrameArrived to ctrlpid</summary>
         [TestMethod]
         public void CameraFeedActor_needs_to_get_update_from_CameraFeedSyncObject_when_using_local_frames()
         {
