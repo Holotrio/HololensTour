@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -25,13 +26,17 @@ namespace TourBackendWPFGUI
     public partial class MainWindow : Window
 
     {
-
+        //Parameters
         public double x_marker = 0;
         public double y_marker = 0;
 
         public double windowHeight = 350;
         public double windowWidth = 525;
 
+        public double hololensWindowHeight = 504;
+        public double hololensWindowWidth = 896;
+
+        //Variables
         public SyncObject syncObject;
         public Dictionary<int, CodeObject> CopyOfDict;// = new Dictionary<string, CodeObject>();
         public System.Int64 lasttimestamp;
@@ -39,12 +44,13 @@ namespace TourBackendWPFGUI
         public CameraFeedSyncObject cameraFeedSyncObject;
         public Bitmap bitmap;
 
-        //public Framework framework;
+        //will be added as soon as dll can be imported
+        //public FrameWork frameWork;
 
         public CommandTestFrames frames;
         public bool framesactivated = false;
-        
 
+        public Stopwatch stopwatch;
 
 
         public MainWindow()
@@ -80,10 +86,14 @@ namespace TourBackendWPFGUI
 
 
             //Initialisierung SyncObject
-            lasttimestamp = 10;
+            stopwatch = new Stopwatch();
+            stopwatch.Start();
+            lasttimestamp = stopwatch.ElapsedMilliseconds;
             syncObject = new SyncObject("syncid", new Dictionary<int, CodeObject>());
             syncObject.SetTimeStamp(lasttimestamp);
             CopyOfDict = new Dictionary<int, CodeObject>();
+
+            cameraFeedSyncObject = new CameraFeedSyncObject("initial_id");
 
         }
 
@@ -93,16 +103,16 @@ namespace TourBackendWPFGUI
             if (syncObject.timestamp != lasttimestamp)
             {
                 lasttimestamp = syncObject.timestamp;
-                CopyOfDict = syncObject.dict;
+                CopyOfDict = CopySyncDict.CopyInt(syncObject.dict);
                 //ReadDictionaryData
                 foreach (int objectid in CopyOfDict.Keys)
                 {
                     //CodeObject with current key
                     CodeObject obj = CopyOfDict[objectid];
 
-                    Marker4.Text = obj.id.ToString();
-
-                    Markers.Items.Add(Marker4);
+                    TextBlock textBlock = new TextBlock();
+                    textBlock.Text = obj.id.ToString();
+                    Markers.Items.Add(textBlock);
                 }
             }
         }
@@ -147,7 +157,7 @@ namespace TourBackendWPFGUI
                 framesactivated = true;
                 UpdateCamerFeedSyncObject(openFileDialog.FileName, bitmap);
 
-                //frameWork = new FrameWork(syncObject, cfSyncObject, markers);
+                //frameWork = new FrameWork(syncObject, cameraFeedSyncObject, new CodeObject[3]);
                 //frameWork.Initialize();
 
             }
@@ -192,9 +202,11 @@ namespace TourBackendWPFGUI
 
         private void Markers_DropDownClosed(object sender, EventArgs e)
         {
-            //here you change all the values of the codeobject
             MessageBox.Show(Markers.Text);
             //compare dict and get values
+            //here you change all the values of the window with the information of the codeobject
+            GetTourState();
+            
 
         }
 
@@ -231,7 +243,8 @@ namespace TourBackendWPFGUI
 
         public void UpdateCamerFeedSyncObject(string _id, Bitmap _bitmap)
         {
-            CameraFeedSyncObject cameraFeedSyncObject = new CameraFeedSyncObject(_id);
+            cameraFeedSyncObject.id = _id;
+            cameraFeedSyncObject.timestamp = stopwatch.ElapsedMilliseconds;
             cameraFeedSyncObject.bitmap = bitmap;
             cameraFeedSyncObject.UpdateFrame();
         }
