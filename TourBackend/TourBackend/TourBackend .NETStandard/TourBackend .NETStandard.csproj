@@ -7,8 +7,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <WarningLevel>1</WarningLevel>
+    <WarningLevel>0</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <Optimize>true</Optimize>
   </PropertyGroup>
 
   <ItemGroup>

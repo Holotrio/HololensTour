@@ -57,6 +57,19 @@ namespace TourBackend
             // Fail test if syncobj hasn't been updated
             Assert.IsTrue(syncobject.dict.ContainsKey(1));
 
+            Assert.IsTrue(Math.Abs(syncobject.dict[1].position[0] - dict[1].position[0])<0.01d);
+            Assert.IsTrue(Math.Abs(syncobject.dict[1].position[1] - dict[1].position[1]) < 0.01d);
+            Assert.IsTrue(Math.Abs(syncobject.dict[1].position[2] - dict[1].position[2]) < 0.01d);
+
+            Assert.IsTrue(Math.Abs(syncobject.dict[1].rotation[0] - dict[1].rotation[0]) < 0.01d);
+            Assert.IsTrue(Math.Abs(syncobject.dict[1].rotation[1] - dict[1].rotation[1]) < 0.01d);
+            Assert.IsTrue(Math.Abs(syncobject.dict[1].rotation[2] - dict[1].rotation[2]) < 0.01d);
+            Assert.IsTrue(Math.Abs(syncobject.dict[1].rotation[3] - dict[1].rotation[3]) < 0.01d);
+            Assert.IsTrue(Math.Abs(syncobject.dict[1].rotation[4] - dict[1].rotation[4]) < 0.01d);
+            Assert.IsTrue(Math.Abs(syncobject.dict[1].rotation[5] - dict[1].rotation[5]) < 0.01d);
+            Assert.IsTrue(Math.Abs(syncobject.dict[1].rotation[6] - dict[1].rotation[6]) < 0.01d);
+            Assert.IsTrue(Math.Abs(syncobject.dict[1].rotation[7] - dict[1].rotation[7]) < 0.01d);
+            Assert.IsTrue(Math.Abs(syncobject.dict[1].rotation[8] - dict[1].rotation[8]) < 0.01d);
         }
         /*
         [TestMethod]
