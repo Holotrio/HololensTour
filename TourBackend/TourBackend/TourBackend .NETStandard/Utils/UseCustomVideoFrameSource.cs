@@ -11,6 +11,7 @@ using Emgu.CV.Aruco;
 using System.Reflection;
 using System.Drawing;
 using static System.Drawing.Bitmap;
+using System.Drawing.Imaging;
 
 namespace TourBackend
 {
@@ -135,29 +136,7 @@ namespace TourBackend
                     returnDict.Add(codeObject.id, codeObject);
                 }
                 return returnDict;
-            }
-
-            public static void CreateMarkerWithID(int _ID)
-            {
-                // define the path where the marker bitmap should be stored
-                var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                path = Path.Combine(path, "Resources");
-
-                // define the type of the Aruco Code with the dictionary
-                var typeOfArucoCode = new  Dictionary(Dictionary.PredefinedDictionaryName.DictArucoOriginal);
-
-                // create the mat where the marker is firstly stored
-                Emgu.CV.Mat arucoCodeAsMat = new Emgu.CV.Mat();
-
-                // draw the marker into the mat
-                Emgu.CV.Aruco.ArucoInvoke.DrawMarker(typeOfArucoCode, 1, 200, arucoCodeAsMat);
-
-
-                // specifiy the filename of the created marker and store it
-                string filename = "ArucoCode_with_ID_" + _ID + ".bmp";
-                var pathTarget = Path.Combine(path,filename);
-                arucoCodeAsMat.Save(pathTarget);
-            }
+            }           
         }
     }
 }

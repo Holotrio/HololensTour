@@ -59,34 +59,13 @@
     <None Update="opencv_ffmpeg330.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\ArucoCode_With_ID_1.bmp">
+    <None Update="Resources\ArucoCode_ID_1_2_3_7_10.bmp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\ArucoCode_With_ID_10.bmp">
+    <None Update="Resources\ArucoCode_ID_1_8.bmp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\ArucoCode_With_ID_2.bmp">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\ArucoCode_With_ID_3.bmp">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\ArucoCode_With_ID_4.bmp">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\ArucoCode_With_ID_5.bmp">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\ArucoCode_With_ID_6.bmp">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\ArucoCode_With_ID_7.bmp">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\ArucoCode_With_ID_8.bmp">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\ArucoCode_With_ID_9.bmp">
+    <None Update="Resources\ArucoCode_No_Marker.bmp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Resources\braun.bmp">
@@ -96,13 +75,19 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Resources\ArucoCode_ID_1.bmp">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Resources\rot.bmp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\SampleScene.bmp">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <None Update="Resources\ArucoCode_ID_7.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Screenshot_148_.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Screenshot_id1_rotated.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Resources\TestFrames\TestVideo_000.bmp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

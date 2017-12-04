@@ -298,16 +298,9 @@ namespace TourBackend
         }
     }
 
-
     [TestClass]
     public class HelpForTesting
     {
-        [TestMethod]
-        public void Create_New_Marker_actually_creates_Bitmap_successfully()
-        {
-            Utils.HelpForTesting.CreateMarkerWithID(1);
-        }
-
         /// <summary>
         /// the idea here is just to create an dictionary with codeObjects to make it easier and more
         /// readable to test. Cause in every test you have to create the recognition Manager and therefore
@@ -317,7 +310,7 @@ namespace TourBackend
         public void Create_New_Dictionary_successfully()
         {
             // check if an empty dictionary gets created correctly
-            Dictionary<int,CodeObject> empty = Utils.HelpForTesting.CreateDictionaryForInitialization(0);
+            Dictionary<int, CodeObject> empty = Utils.HelpForTesting.CreateDictionaryForInitialization(0);
             Assert.AreEqual(0, empty.Count);
 
             // check if a dictionary of 10 codeObjects gets created correctly
@@ -327,16 +320,16 @@ namespace TourBackend
             // check if a dictionary of 3 codeObjects gets created correctly and takes on the right values
             Dictionary<int, CodeObject> threeCO = Utils.HelpForTesting.CreateDictionaryForInitialization(3);
             Assert.AreEqual(3, threeCO.Count);
-            for(int i = 0; i < threeCO.Count; ++i)
+            for (int i = 0; i < threeCO.Count; ++i)
             {
                 Assert.AreEqual(true, threeCO.ContainsKey(i + 1));
-                Assert.AreEqual(false, threeCO[i+1].isActive);
-                Assert.AreEqual(1f + i, threeCO[i+1].position[0]);
-                Assert.AreEqual(2f + i, threeCO[i+1].position[1]);
-                Assert.AreEqual(3f + i, threeCO[i+1].position[2]);
-                Assert.AreEqual(0.1f + i, threeCO[i+1].rotation[0]);
-                Assert.AreEqual(0.1f + i, threeCO[i+1].rotation[1]);
-                Assert.AreEqual(0.1f + i, threeCO[i+1].rotation[2]);
+                Assert.AreEqual(false, threeCO[i + 1].isActive);
+                Assert.AreEqual(1f + i, threeCO[i + 1].position[0]);
+                Assert.AreEqual(2f + i, threeCO[i + 1].position[1]);
+                Assert.AreEqual(3f + i, threeCO[i + 1].position[2]);
+                Assert.AreEqual(0.1f + i, threeCO[i + 1].rotation[0]);
+                Assert.AreEqual(0.1f + i, threeCO[i + 1].rotation[1]);
+                Assert.AreEqual(0.1f + i, threeCO[i + 1].rotation[2]);
             }
         }
 
@@ -350,7 +343,7 @@ namespace TourBackend
             // first get an bitmap
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path = Path.Combine(path, "Resources");
-            path = Path.Combine(path, "SampleScene.bmp");
+            path = Path.Combine(path, "ArucoCode_ID_7.bmp");
             Stream testfile = File.OpenRead(path);
             var _testbitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(testfile);
 
@@ -382,9 +375,9 @@ namespace TourBackend
 
             // here we extract the translation vector out of the tvecs mat return value
             // which stored the values as doubles in the mat
-            double[] _tvecs = new double[3];            
+            double[] _tvecs = new double[3];
             tvecs.CopyTo<double>(_tvecs);
-            for(int i = 0; i < _tvecs.Length; ++i)
+            for (int i = 0; i < _tvecs.Length; ++i)
             {
                 Console.WriteLine("tvecs = " + _tvecs[i]);
             }
@@ -408,11 +401,10 @@ namespace TourBackend
             for (int i = 0; i < _rotMat.Length; ++i)
             {
                 double help = i / 3;
-                int index_x = (int) Math.Floor(help);
+                int index_x = (int)Math.Floor(help);
                 int index_y = i % 3;
                 Console.WriteLine("rotMat(" + index_x + ", " + index_y + ") = " + _rotMat[i]);
             }
-
         }
     }
 }
