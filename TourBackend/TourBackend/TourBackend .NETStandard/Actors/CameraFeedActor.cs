@@ -34,6 +34,11 @@ namespace TourBackend
             sync.FrameUpdated += OnFrameUpdated;
         }
 
+        /// <summary>
+        /// Behaviour of the actor. Might want to expand upon this. [Internal Use] [Modifyable]
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public Task ReceiveAsync(IContext context)
         {
             var msg = context.Message;

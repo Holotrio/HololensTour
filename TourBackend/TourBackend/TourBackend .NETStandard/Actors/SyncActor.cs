@@ -29,8 +29,8 @@ namespace TourBackend
         /// <summary>
         /// Started by ControlActor. [Internal Use]
         /// </summary>
-        /// <param name="_id"></param>
-        /// <param name="_syncobject"></param>
+        /// <param name="_id">Name to be given to the SyncActor</param>
+        /// <param name="_syncobject">User provided SyncObject</param>
         public SyncActor(string _id, SyncObject _syncobject)
         {
             id = _id;

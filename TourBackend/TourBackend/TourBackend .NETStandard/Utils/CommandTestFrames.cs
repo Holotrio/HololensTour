@@ -14,10 +14,12 @@ namespace TourBackend
         public Bitmap[] frames;
         public int currentIdx;
 
-        public CommandTestFrames(Bitmap[] _frames){
+        public CommandTestFrames(Bitmap[] _frames)
+        {
             frames = _frames;
             currentIdx = 0;
         }
+
         /// <summary>
         /// Return the Bitmap at the current position in the array and set the current position to the next Bitmap. [External Use]
         /// </summary>
@@ -29,7 +31,8 @@ namespace TourBackend
             {
                 currentIdx = 0;
             }
-            else {
+            else
+            {
                 currentIdx++;
             }
             return returnvalue;
@@ -44,7 +47,7 @@ namespace TourBackend
             Bitmap returnvalue = frames[currentIdx];
             if (currentIdx == 0)
             {
-                currentIdx = frames.Length-1;
+                currentIdx = frames.Length - 1;
             }
             else
             {
@@ -65,7 +68,8 @@ namespace TourBackend
         /// <summary>
         /// Returns the position to the beginning of the array. [External Use]
         /// </summary>
-        public void Reset() {
+        public void Reset()
+        {
             currentIdx = 0;
         }
 

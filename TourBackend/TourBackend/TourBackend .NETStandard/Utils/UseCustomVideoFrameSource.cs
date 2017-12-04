@@ -15,8 +15,6 @@ using System.Drawing.Imaging;
 
 namespace TourBackend
 {
-
-    // TestActor which links every received message to a referenced object
     /// <summary>
     /// Used to link a message from one actor to another place [Internal Use] [Testing Only]
     /// </summary>
