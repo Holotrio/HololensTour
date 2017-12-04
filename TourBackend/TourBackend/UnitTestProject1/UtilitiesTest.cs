@@ -382,6 +382,10 @@ namespace TourBackend
 
             // here we extract the translation vector out of the tvecs mat return value
             // which stored the values as doubles in the mat
+
+            // Moritz: darauf achten, dass die Dimensionen stimmen! 
+            // Generell können in rvecs/tvecs beliebig viele Einträge stehen.
+
             double[] _tvecs = new double[3];            
             tvecs.CopyTo<double>(_tvecs);
             for(int i = 0; i < _tvecs.Length; ++i)
@@ -401,6 +405,7 @@ namespace TourBackend
             // here we create a rotation matrix out of the rotation vector, it is this a 3x3 matrix with
             // 9 elements and it is like: rotMat(x,y) = _rotmat(x+y-2)
             // which stored the values as doubles in the mat
+
             double[] _rotMat = new double[9];
             Mat rotMat = new Mat();
             Emgu.CV.CvInvoke.Rodrigues(rvecs, rotMat, null);

@@ -34,16 +34,21 @@ namespace TourBackend
             return Actor.Done;
         }
 
+        /*This function is enacted upon receiving an update from the SyncObject. 
+         It copies the data from the object and notifies the ControlActor that 
+         new data is available.*/
+
         protected void OnFrameUpdated(object Sender, EventArgs e)
         {
             if (true) // Condition here is to be defined... might make sense to only process every second frame or so
             {
                 lock (sync.thisLock)
                 {
-                    latestBitmap = sync.bitmap; // SoftwareBitmap.Copy(sync.bitmap); Need to think about safety of passing bitmap as reference
+                    latestBitmap = sync.bitmap;
                     latestTimestamp = sync.timestamp;
                 }
                 ctrlActor.Tell(new NewFrameArrived(latestTimestamp.ToString(), latestBitmap));
+                Console.WriteLine("CameraFeedSyncObject says: New Frame Arrived");
             }
         }
 

@@ -21,14 +21,11 @@ namespace TourBackend
 
             //This dict will have to be updated to be true to the frame
             var dict = new Dictionary<int, CodeObject>();
-            var cd1 = new CodeObject();
-            var cd2 = new CodeObject(); // Just build two "random" CodeObjects
-            CodeObject[] codeobjs = new CodeObject[2];
+            var cd1 = new CodeObject(1, new[] { -0.0716567589573924f, 0.000621125026751875f, 0.421481938204676f }, new[] { 0.997540310976068f, -0.00352611230630855f, -0.0700063890639387f, -0.00696372073051795f, -0.99877837158065f, -0.0489210696560579f, -0.0697483660837701f, 0.0492882439807792f, -0.996346242244098f }, true);
+            CodeObject[] codeobjs = new CodeObject[1];
             codeobjs.SetValue(cd1,0);
-            codeobjs.SetValue(cd2, 1);
 
             dict.Add(1, cd1);
-            dict.Add(2, cd2);
 
             FrameWork fw = new FrameWork(syncobject, camerafeedsyncobject, codeobjs);
             fw.Initialize();
@@ -36,7 +33,7 @@ namespace TourBackend
             // Creates a testframe from local bitmaps
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path = Path.Combine(path, "Resources");
-            path = Path.Combine(path, "TestVideo_000.bmp");
+            path = Path.Combine(path, "ArucoCode_ID_1.bmp");
             Stream testfile = File.OpenRead(path);
             var testframe = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(testfile);
 
@@ -52,13 +49,14 @@ namespace TourBackend
             // See if the output has been updated within 1 second
             Stopwatch stop = new Stopwatch();
             stop.Start();
-            while (stop.ElapsedMilliseconds < 1000 && syncobject.dict != dict) {
+            while (stop.ElapsedMilliseconds < 5000 && syncobject.dict != dict) {
                 Thread.Sleep(5); // Arbitrary sleep length
             }
             stop.Stop();
 
             // Fail test if syncobj hasn't been updated
-            CollectionAssert.AreEqual(syncobject.dict, dict);
+            Assert.IsTrue(syncobject.dict.ContainsKey(1));
+
         }
 
         [TestMethod]
