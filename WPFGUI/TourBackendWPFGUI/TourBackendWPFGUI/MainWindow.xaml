@@ -48,7 +48,7 @@
 
 
 
-        <Canvas Grid.Row="2" Grid.RowSpan="6" Grid.Column="2" Grid.ColumnSpan="4">
+        <Canvas Grid.Row="2" Grid.RowSpan="6" Grid.Column="2" Grid.ColumnSpan="4" MaxHeight="350" MaxWidth="525">
             <Ellipse x:Name ="Markerpointer2" Height="15" Width="15" StrokeThickness="2" Stroke="Black"  Fill="Red"/>
         </Canvas>
 

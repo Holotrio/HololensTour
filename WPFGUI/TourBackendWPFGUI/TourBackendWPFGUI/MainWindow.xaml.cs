@@ -26,17 +26,19 @@ namespace TourBackendWPFGUI
     public partial class MainWindow : Window
 
     {
-        //Parameters
+
         public double x_marker = 0;
         public double y_marker = 0;
 
         public double windowHeight = 350;
         public double windowWidth = 525;
 
+        public double frameHeight = 190;
+        public double frameWidth = 262.5;
+
         public double hololensWindowHeight = 504;
         public double hololensWindowWidth = 896;
 
-        //Variables
         public SyncObject syncObject;
         public Dictionary<int, CodeObject> CopyOfDict;// = new Dictionary<string, CodeObject>();
         public System.Int64 lasttimestamp;
@@ -93,6 +95,8 @@ namespace TourBackendWPFGUI
             syncObject.SetTimeStamp(lasttimestamp);
             CopyOfDict = new Dictionary<int, CodeObject>();
 
+            syncObject.SyncObjectUpdated += OnSyncObjectUpdated;
+
             cameraFeedSyncObject = new CameraFeedSyncObject("initial_id");
 
         }
@@ -110,9 +114,11 @@ namespace TourBackendWPFGUI
                     //CodeObject with current key
                     CodeObject obj = CopyOfDict[objectid];
 
+                    //Add items to dropdownlist 
                     TextBlock textBlock = new TextBlock();
                     textBlock.Text = obj.id.ToString();
                     Markers.Items.Add(textBlock);
+
                 }
             }
         }
@@ -193,20 +199,56 @@ namespace TourBackendWPFGUI
 
             windowHeight = newWindowHeight;
             windowWidth = newWindowWidth;
+
+            object eventobject = new object();
+            Markers_DropDownClosed(eventobject, EventArgs.Empty);
         }
 
         private void DisplayContentCodeObject()
         {
+            //Compare Aruco ID with the chosen Marker -> basically parse string to int
+            int id = -1;
+            string stringid = Markers.Text;
+            stringid = stringid.Substring(stringid.LastIndexOf('_') + 1);
+            bool possibleToParse = Int32.TryParse(stringid, out id);
+
+            if (possibleToParse)
+            {
+                CodeObject testobject = new CodeObject(id, new float[] { 350, 2, 290 }, new float[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+
+                if(!CopyOfDict.ContainsKey(id)) CopyOfDict.Add(id, testobject);
+
+                if (CopyOfDict.ContainsKey(id)) 
+                {
+                    CodeObject obj = CopyOfDict[id];
+                    pos_x.Text = obj.position[0].ToString();
+                    pos_y.Text = obj.position[1].ToString();
+                    pos_z.Text = obj.position[2].ToString();
+                    SetPointOnMarker(obj.position);
+                }
+            }
 
         }
 
-        private void Markers_DropDownClosed(object sender, EventArgs e)
+        public void SetPointOnMarker(float[] position)
         {
-            MessageBox.Show(Markers.Text);
+            double xpos = position[0];
+            double zpos = position[2];
+
+            xpos = xpos * (windowWidth * 6f / 11f) / hololensWindowWidth;
+            zpos = zpos * (windowHeight * 4f / 8f) / hololensWindowHeight;
+
+            Canvas.SetLeft(Markerpointer2, xpos);
+            Canvas.SetBottom(Markerpointer2, zpos);
+
+        }
+
+        public void Markers_DropDownClosed(object sender, EventArgs e)
+        {
+            //here you change all the values of the codeobject
+            //MessageBox.Show(Markers.Text);
             //compare dict and get values
-            //here you change all the values of the window with the information of the codeobject
-            GetTourState();
-            
+            DisplayContentCodeObject();
 
         }
 
@@ -247,6 +289,11 @@ namespace TourBackendWPFGUI
             cameraFeedSyncObject.timestamp = stopwatch.ElapsedMilliseconds;
             cameraFeedSyncObject.bitmap = bitmap;
             cameraFeedSyncObject.UpdateFrame();
+        }
+
+        protected void OnSyncObjectUpdated(object Sender, EventArgs e)
+        {
+            GetTourState();
         }
     }
 }

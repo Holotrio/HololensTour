@@ -9,6 +9,23 @@ namespace TourBackend
 {
     public class SyncObject
     {
+        //has to be added to framework
+        public event EventHandler SyncObjectUpdated;
+
+        protected void OnSyncObjectUpdated(EventArgs e)
+        {
+            EventHandler handler = SyncObjectUpdated;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+
+        public void UpdateSyncObject()
+        {
+            OnSyncObjectUpdated(EventArgs.Empty);
+        }
+
         public Int64 timestamp;
 
         public object thisLock = new Object();
