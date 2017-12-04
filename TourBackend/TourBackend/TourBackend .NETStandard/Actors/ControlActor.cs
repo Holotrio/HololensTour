@@ -13,7 +13,8 @@ namespace TourBackend
     /// Root initilization class of the whole system.
     /// It's constructor is called with all information that is needed for the system to work.
     /// </summary>
-    public class FrameWork {
+    public class FrameWork
+    {
         /* markers is the array which is given to the framework by the constructor.
             It contains the IDs of the markers which are to be recognized */
         public CodeObject[] markers;
@@ -28,12 +29,13 @@ namespace TourBackend
         private CameraFeedSyncObject video;
 
         /// <summary>
-        /// 
+        /// Constructs the framework [External Use]
         /// </summary>
-        /// <param name="_syncobj">SyncObject as defined in </param>
-        /// <param name="_video"></param>
-        /// <param name="_markers"></param>
-        public FrameWork(SyncObject _syncobj, CameraFeedSyncObject _video, CodeObject[] _markers) {
+        /// <param name="_syncobj">SyncObject as defined in Other_Classes/SyncObject, used for synchronizing output data with user</param>
+        /// <param name="_video">CameraFeedSyncObject as defined in Other_Classes/CameraFeedSyncObject used for synchronizing input data with user</param>
+        /// <param name="_markers">CodeObjects as defined in Other_Classes/CodeObject used to encapsulate detected markers</param>
+        public FrameWork(SyncObject _syncobj, CameraFeedSyncObject _video, CodeObject[] _markers)
+        {
             syncobj = _syncobj;
             video = _video;
             markers = _markers;
@@ -43,7 +45,9 @@ namespace TourBackend
         /*The initialization process makes sure that all essential Actors, which are 
              RecognitionManager, SyncActor & CameraFeedActor are started and that the 
              ControlActor knows its own PID*/
-
+        /// <summary>
+        /// Initializes the framework [External Use]
+        /// </summary>
         public void Initialize()
         {
             var propsctrl = Actor.FromProducer(() => new ControlActor("ctrl", syncobj, video, idToCodeObject));
@@ -51,18 +55,25 @@ namespace TourBackend
 
             pidctrl.RequestAsync<RespondStartFramework>(new StartFramework(pidctrl), TimeSpan.FromSeconds(1));
         }
-
-        public PID GetPID() {
+        /// <summary>
+        /// Returns own PID. [Internal Use]
+        /// </summary>
+        /// <returns></returns>
+        public PID GetPID()
+        {
             return this.pidctrl;
         }
 
     }
 
-    /* This message is there to let the ControlActor know its own PID*/
-
-    public class StartFramework {
+    /// <summary>
+    /// This message is there to let the ControlActor know its own PID. [Internal Use]
+    /// </summary>
+    public class StartFramework
+    {
         public PID ctrl;
-        public StartFramework(PID _ctrl) {
+        public StartFramework(PID _ctrl)
+        {
             ctrl = _ctrl;
         }
     }
@@ -70,21 +81,28 @@ namespace TourBackend
     /* The class RespondStartFramework is the answer to StartFramework.
      It verifies that RecognitionManager, SyncActor & CameraFeedActor have been started
      by passing their PIDs. */
-
-    public class RespondStartFramework {
+     /// <summary>
+     /// Answer to StartFramework [Internal Use]
+     /// </summary>
+    public class RespondStartFramework
+    {
 
         public PID syncactor;
         public PID recognitionmanager;
         public PID camerafeedactor;
 
-        public RespondStartFramework(){ }
-        public RespondStartFramework(PID _syncactor, PID _recognitionmanager, PID _camerafeedactor) {
+        public RespondStartFramework() { }
+        public RespondStartFramework(PID _syncactor, PID _recognitionmanager, PID _camerafeedactor)
+        {
             syncactor = _syncactor;
             recognitionmanager = _recognitionmanager;
             camerafeedactor = _camerafeedactor;
         }
     }
 
+    /// <summary>
+    /// Main Actor in the system. Controls and supervises essential actors [Internal Use] [Modifyable]
+    /// </summary>
     public class ControlActor : IActor
     {
         /*Please see the ActorDiagram for information on how the Actors work together*/
@@ -104,9 +122,11 @@ namespace TourBackend
         /*IDToCodeObject is the dictionary containing the information which CodeObject has which ID*/
         public Dictionary<int, CodeObject> IDToCodeObject;
 
-
-        /*Starts the essential Actors*/
-        public void Start() {
+        /// <summary>
+        /// Starts the essential Actors [Internal Use]
+        /// </summary>
+        public void Start()
+        {
             var syncprops = Actor.FromProducer(() => new SyncActor("syncactor", sync));
             this.syncActor = Actor.Spawn(syncprops);
 
@@ -117,6 +137,13 @@ namespace TourBackend
             this.recognitionManager = Actor.Spawn(cameraFeedSyncprops);
         }
 
+        /// <summary>
+        /// Constructs the ControlActor. Use for testing/operation. [Internal Use]
+        /// </summary>
+        /// <param name="_id">Name the ControlActor should have, e.g. CtrlActor</param>
+        /// <param name="_sync">User provided SyncObject</param>
+        /// <param name="_video">User provided CameraFeedSyncObject</param>
+        /// <param name="_dict">User defined Markers</param>
         public ControlActor(string _id, SyncObject _sync, CameraFeedSyncObject _video, Dictionary<int, CodeObject> _dict)
         {
             id = _id;
@@ -158,7 +185,11 @@ namespace TourBackend
                     break;
             }
         }
-
+        /// <summary>
+        /// Behaviour of ControlActor. [Internal Use] [Modifyable]
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public Task ReceiveAsync(IContext context)
         {
             var msg = context.Message;
@@ -166,13 +197,13 @@ namespace TourBackend
             {
                 /*StartFramework means, that the Framework has been constructed & is being initialized*/
                 case StartFramework s:
-                    self = s.ctrl; 
+                    self = s.ctrl;
                     this.Start(); // Start the essential actors RecognitionManager, SyncActor & CameraFeedSyncManager
                     context.Sender.Tell(new RespondStartFramework(syncActor, recognitionManager, cameraFeedSyncActor));
                     Console.WriteLine("ControlActor has been started");
                     break;
 
-                    /*This message should arrive everytime a new frame has been deposited on the CameraFeedSyncObject*/
+                /*This message should arrive everytime a new frame has been deposited on the CameraFeedSyncObject*/
                 case NewFrameArrived n:
                     recognitionManager.Tell(n);
                     Console.WriteLine("ControlActor says: Frame arrived");
@@ -182,13 +213,13 @@ namespace TourBackend
                  The Control Actor then retrieves all recognized objects via RequestAllVirtualObjects*/
 
                 case RespondNewFrameArrived r:
-                    recognitionManager.Request(new RequestAllVirtualObjects(r.messageID,TimeSpan.FromMilliseconds(25)), self);
+                    recognitionManager.Request(new RequestAllVirtualObjects(r.messageID, TimeSpan.FromMilliseconds(25)), self);
                     Console.WriteLine("ControlActor says: RecognitionManager has evaulated Frame");
                     break;
 
-                    /*This message is sent by the RecognitionManager, telling the ControlActor the currently active Markers
-                     Active is defined as having been recognized in the latest frame.
-                     The ControlActor then tells the SyncActor to make the data available to the user.*/
+                /*This message is sent by the RecognitionManager, telling the ControlActor the currently active Markers
+                 Active is defined as having been recognized in the latest frame.
+                 The ControlActor then tells the SyncActor to make the data available to the user.*/
                 case RespondRequestAllVirtualObjects r:
                     syncActor.Request(new WriteCurrentTourState(r.messageID, r.newCodeObjectIDToCodeObject), self);
                     Console.WriteLine("ControlActor says: Requesting write of Current Tour State");

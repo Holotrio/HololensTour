@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Proto;
 
+// DEPRECEATED
+
 namespace TourBackend
 {
     public class CodeObjectActor : IActor

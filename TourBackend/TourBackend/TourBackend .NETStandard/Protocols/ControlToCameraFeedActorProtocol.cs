@@ -8,7 +8,9 @@ using System.Drawing;
 
 namespace TourBackend
 {
-
+    /// <summary>
+    /// This message notifies either the ControlActor or the RecognitionManager that a new frame has arrived and is ready to be processed. [Internal Use]
+    /// </summary>
     public class NewFrameArrived
     {
         public string id;

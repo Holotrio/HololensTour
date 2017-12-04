@@ -8,6 +8,9 @@ using System.Drawing;
 
 namespace TourBackend
 {
+    /// <summary>
+    /// Essential actor in the system. Manages the interaction with input data (i.e.: frames) and notifies the ControlActor.
+    /// </summary>
     public class CameraFeedActor : IActor
     {
 
@@ -17,6 +20,12 @@ namespace TourBackend
         public Bitmap latestBitmap;
         public Int64 latestTimestamp;
 
+        /// <summary>
+        /// Started by ControlActor. [Internal Use]
+        /// </summary>
+        /// <param name="_id">Name to be given, e.g.: CamFeedActor</param>
+        /// <param name="_sync">User provided SyncObject</param>
+        /// <param name="_ctrlActor">PID of the ControlActor which started this actor</param>
         public CameraFeedActor(string _id, CameraFeedSyncObject _sync, PID _ctrlActor)
         {
             ctrlActor = _ctrlActor;
@@ -34,10 +43,11 @@ namespace TourBackend
             return Actor.Done;
         }
 
-        /*This function is enacted upon receiving an update from the SyncObject. 
-         It copies the data from the object and notifies the ControlActor that 
-         new data is available.*/
-
+        /// <summary>
+        /// This function is enacted upon receiving an update from the SyncObject. It copies the data from the object and notifies the ControlActor that new data is available. [Internal Use]
+        /// </summary>
+        /// <param name="Sender"></param>
+        /// <param name="e"></param>
         protected void OnFrameUpdated(object Sender, EventArgs e)
         {
             if (true) // Condition here is to be defined... might make sense to only process every second frame or so

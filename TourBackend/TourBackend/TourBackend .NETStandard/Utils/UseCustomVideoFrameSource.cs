@@ -17,6 +17,9 @@ namespace TourBackend
 {
 
     // TestActor which links every received message to a referenced object
+    /// <summary>
+    /// Used to link a message from one actor to another place [Internal Use] [Testing Only]
+    /// </summary>
     public class TestActor : IActor
     {
         public object testMsg;
@@ -35,10 +38,23 @@ namespace TourBackend
         }
     }
 
+    /// <summary>
+    /// This classes encompasses various utility functions
+    /// </summary>
     public static class Utils
     {
+        /// <summary>
+        /// Encompasses functions which are needed to convert a Bitmap to an Emgu Image, since System.Drawing.Bitmap is not fully available on .NET Core 2.0 [Internal Use] [Testing Only]
+        /// </summary>
         public static class BitmapToImage
         {
+            /// <summary>
+            /// Gets the color of one specific pixel in the BGR format. [Internal Use] [Testing Only]
+            /// </summary>
+            /// <param name="_bitmap">User provided Bitmap</param>
+            /// <param name="x">x-coordinate of the pixel whose color is to be determined.</param>
+            /// <param name="y">y-coordinate of the pixel whose color is to be determined.</param>
+            /// <returns>BGR value (flipped RGB value) of the pixel</returns>
             public static byte[] ColorOfPixelXY(System.Drawing.Bitmap _bitmap, int x, int y)
             {
                 var color = _bitmap.GetPixel(x, y);
@@ -49,6 +65,11 @@ namespace TourBackend
                 return returnarray;
             }
 
+            /// <summary>
+            /// Gets the pixel information of all pixels in a Bitmap and returns them as byte array in BGR format. [Internal Use] [Testing Only]
+            /// </summary>
+            /// <param name="_bitmap">Bitmap to be analyzed</param>
+            /// <returns>3D byte array with pixel data: WidthxHeightxBGR</returns>
             public static byte[][][] GetPixelBytes(System.Drawing.Bitmap _bitmap)
             {
                 byte[][][] returnvalue = new Byte[_bitmap.Width][][];
@@ -68,6 +89,11 @@ namespace TourBackend
                 return returnvalue;
             }
 
+            /// <summary>
+            /// Creates an Emgu Image from the given Bitmap without using System.Drawing.Bitmap functions. [Internal Use] [Testing Only]
+            /// </summary>
+            /// <param name="_bitmap">Bitmap to be analyzed.</param>
+            /// <returns>Emgu Image which represents the given Bitmap</returns>
             public static Image<Bgr, Byte> CreateImagefromBitmap(System.Drawing.Bitmap _bitmap)
             {
 

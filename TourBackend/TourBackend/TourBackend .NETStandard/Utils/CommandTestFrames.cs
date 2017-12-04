@@ -6,6 +6,9 @@ using System.Drawing;
 
 namespace TourBackend
 {
+    /// <summary>
+    /// Used to easily breeze through an array of Bitmaps. [External Use]
+    /// </summary>
     public class CommandTestFrames
     {
         public Bitmap[] frames;
@@ -15,7 +18,10 @@ namespace TourBackend
             frames = _frames;
             currentIdx = 0;
         }
-
+        /// <summary>
+        /// Return the Bitmap at the current position in the array and set the current position to the next Bitmap. [External Use]
+        /// </summary>
+        /// <returns>Current Bitmap</returns>
         public System.Drawing.Bitmap ReturnAndSetNextFrame()
         {
             Bitmap returnvalue = frames[currentIdx];
@@ -29,6 +35,10 @@ namespace TourBackend
             return returnvalue;
         }
 
+        /// <summary>
+        /// Return the Bitmap at the current position in the array and set the current position to the previous Bitmap. [External Use]
+        /// </summary>
+        /// <returns>Current Bitmap</returns>
         public System.Drawing.Bitmap ReturnAndSetPreviousFrame()
         {
             Bitmap returnvalue = frames[currentIdx];
@@ -43,11 +53,18 @@ namespace TourBackend
             return returnvalue;
         }
 
+        /// <summary>
+        /// Return the Bitmap at the current position in the array and leave the position at the current Bitmap. [External Use]
+        /// </summary>
+        /// <returns>Current Bitmap</returns>
         public System.Drawing.Bitmap GetCurrentFrame()
         {
             return frames[currentIdx];
         }
 
+        /// <summary>
+        /// Returns the position to the beginning of the array. [External Use]
+        /// </summary>
         public void Reset() {
             currentIdx = 0;
         }

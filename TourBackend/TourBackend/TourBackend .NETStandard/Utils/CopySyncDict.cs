@@ -6,8 +6,16 @@ using System.Threading.Tasks;
 
 namespace TourBackend
 {
+    /// <summary>
+    /// Used to create a deep copy of a CodeObject, since Dictionary does not implement ICloneable. [External Use]
+    /// </summary>
     public static class CopySyncDict
     {
+        /// <summary>
+        /// Creates a deep copy of the given Dictionary. [External Use]
+        /// </summary>
+        /// <param name="_dict">Dictionary to be copied</param>
+        /// <returns>Deep copy of the given Dictionay</returns>
         public static Dictionary<string, CodeObject> Copy(Dictionary<string, CodeObject> _dict) {
             Dictionary<string, CodeObject> copy = new Dictionary<string, CodeObject>();
 

@@ -10,6 +10,9 @@ using System.Diagnostics;
 
 namespace TourBackend
 {
+    /// <summary>
+    /// Essential actor in the system. Manages the interaction with output data on the SyncObject.
+    /// </summary>
     public class SyncActor : IActor
     {
 
@@ -22,6 +25,12 @@ namespace TourBackend
         /*The SyncActor has an internal stopwatch which is used to distinguish between frames
          and offers are comparable metric for performance*/
 
+
+        /// <summary>
+        /// Started by ControlActor. [Internal Use]
+        /// </summary>
+        /// <param name="_id"></param>
+        /// <param name="_syncobject"></param>
         public SyncActor(string _id, SyncObject _syncobject)
         {
             id = _id;
@@ -30,6 +39,11 @@ namespace TourBackend
             stopwatch.Start();
         }
 
+        /// <summary>
+        /// Behaviour of SyncActor. [Internal Use]
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public Task ReceiveAsync(IContext context)
         {
             var msg = context.Message;
@@ -42,7 +56,7 @@ namespace TourBackend
                     lock (syncobject.thisLock)
                     {
                         syncobject.SetTimeStamp(stopwatch.ElapsedMilliseconds);
-                        syncobject.dict = new Dictionary<int, CodeObject>(w.dict);
+                        syncobject.dict = new Dictionary<int, CodeObject>(w.IDToCodeObject);
                     }
                     context.Sender.Tell(new RespondWriteCurrentTourState(w.id));
                     Console.WriteLine("SyncActor says: Current State was written.");
