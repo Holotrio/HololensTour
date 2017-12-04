@@ -104,8 +104,8 @@ namespace TourBackend
             public static Dictionary<int, CodeObject> CreateDictionaryForInitialization(int _numberOfCodeObjects)
             {
                 int[] ids = new int[_numberOfCodeObjects];
-                float[ , ] positions = new float[_numberOfCodeObjects, 3];
-                float[ , ] rotations = new float[_numberOfCodeObjects, 3];
+                double[ , ] positions = new double[_numberOfCodeObjects, 3];
+                double[ , ] rotations = new double[_numberOfCodeObjects, 3];
                 const bool isActive = false;
                 Dictionary<int, CodeObject> returnDict = new Dictionary<int, CodeObject>();
 
@@ -122,12 +122,12 @@ namespace TourBackend
 
                 for (int i = 0; i < _numberOfCodeObjects; ++i)
                 {
-                    float[] position = new float[3];
+                    double[] position = new double[3];
                     position[0] = positions[i, 0];
                     position[1] = positions[i, 1];
                     position[2] = positions[i, 2];
 
-                    float[] rotation = new float[3];
+                    double[] rotation = new double[3];
                     rotation[0] = rotations[i, 0];
                     rotation[1] = rotations[i, 1];
                     rotation[2] = rotations[i, 2];

@@ -13,8 +13,8 @@ namespace TourBackend
         public bool isActive = true;
 
         public int objectid;
-        public float[] position;
-        public float[] rotation;
+        public double[] position;
+        public double[] rotation;
 
         public CodeObjectActor(int _objectid, bool _isActive)
         {

@@ -18,10 +18,10 @@ namespace TourBackend
         {
             CameraFeedSyncObject camerafeedsyncobject = new CameraFeedSyncObject("new");
             SyncObject syncobject = new SyncObject("sync1", new Dictionary<int, CodeObject>());
-
+            
             //This dict will have to be updated to be true to the frame
             var dict = new Dictionary<int, CodeObject>();
-            var cd1 = new CodeObject(1, new[] { -0.0716567589573924f, 0.000621125026751875f, 0.421481938204676f }, new[] { 0.997540310976068f, -0.00352611230630855f, -0.0700063890639387f, -0.00696372073051795f, -0.99877837158065f, -0.0489210696560579f, -0.0697483660837701f, 0.0492882439807792f, -0.996346242244098f }, true);
+            var cd1 = new CodeObject(1, new[] { -0.0716567589573924d, 0.000621125026751875d, 0.421481938204676d }, new[] { 0.997540310976068d, -0.00352611230630855d, -0.0700063890639387d, -0.00696372073051795d, -0.99877837158065d, -0.0489210696560579d, -0.0697483660837701d, 0.0492882439807792d, -0.996346242244098d }, true);
             CodeObject[] codeobjs = new CodeObject[1];
             codeobjs.SetValue(cd1,0);
 
@@ -58,7 +58,7 @@ namespace TourBackend
             Assert.IsTrue(syncobject.dict.ContainsKey(1));
 
         }
-
+        /*
         [TestMethod]
         public void Multiple_frames_need_to_travel_from_CameraFeedSyncObject_To_SyncActor_with_mock_Frames()
         {
@@ -110,6 +110,6 @@ namespace TourBackend
                 CollectionAssert.AreEqual(syncobject.dict, dict);
             }
         }
-
+        */
     }
 }

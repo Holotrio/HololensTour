@@ -302,11 +302,6 @@ namespace TourBackend
     [TestClass]
     public class HelpForTesting
     {
-        [TestMethod]
-        public void Create_New_Marker_actually_creates_Bitmap_successfully()
-        {
-            Utils.HelpForTesting.CreateMarkerWithID(1);
-        }
 
         /// <summary>
         /// the idea here is just to create an dictionary with codeObjects to make it easier and more
@@ -350,7 +345,7 @@ namespace TourBackend
             // first get an bitmap
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path = Path.Combine(path, "Resources");
-            path = Path.Combine(path, "SampleScene.bmp");
+            path = Path.Combine(path, "Screenshot_148_.bmp");
             Stream testfile = File.OpenRead(path);
             var _testbitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(testfile);
 

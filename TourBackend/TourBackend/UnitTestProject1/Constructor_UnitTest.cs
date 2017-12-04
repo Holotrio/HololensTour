@@ -231,8 +231,8 @@ namespace TourBackend
         {
             bool _isActive = false;
             int _objectid = 35735;
-            float[] _position = { 1f, 2f, 3f };
-            float[] _rotation = { 2f, 5f, 7f };
+            double[] _position = { 1d, 2d, 3d };
+            double[] _rotation = { 2d, 5d, 7d };
             // create two testobjects with the two different constructors
             CodeObject testCodeObject1 = new CodeObject(_objectid, _position, _rotation);
             CodeObject testCodeObject2 = new CodeObject(_objectid, _position, _rotation,_isActive);
@@ -255,8 +255,8 @@ namespace TourBackend
         {
             string _messageID = "Create1";
             int _codeObjectID = 1;
-            float[] _position = { 1f, 2f, 4f };
-            float[] _rotation = { 1f, 2.3f, 34f, 0.5f, 2f, 3f, 8.9f, 0.9f, 2.1f };
+            double[] _position = { 1d, 2d, 4d };
+            double[] _rotation = { 1d, 2.3d, 34d, 0.5d, 2d, 3d, 8.9d, 0.9d, 2.1d };
             bool _isActive = false;
             CodeObject _codeObject = new CodeObject(_codeObjectID, _position, _rotation, _isActive);
             var msg = new CreateNewVirtualObject(_messageID, _codeObjectID, _codeObject);

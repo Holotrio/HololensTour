@@ -26,8 +26,8 @@ namespace TourBackend
             var pidctrl = Actor.Spawn(propsctrl);
 
             var dict = new Dictionary<int, CodeObject>();
-            var cd1 = new CodeObject(7, new[] { 1f, 2f, 3f }, new[] { 4f, 5f, 6f });
-            var cd2 = new CodeObject(9, new[] { 4f, 7f, 8f }, new[] { 1f, 19f, 3f }); // Just build two "random" CodeObjects
+            var cd1 = new CodeObject(7, new[] { 1d, 2d, 3d }, new[] { 4d, 5d, 6d });
+            var cd2 = new CodeObject(9, new[] { 4d, 7d, 8d }, new[] { 1d, 19d, 3d }); // Just build two "random" CodeObjects
 
             dict.Add(7, cd1);
             dict.Add(9, cd2);

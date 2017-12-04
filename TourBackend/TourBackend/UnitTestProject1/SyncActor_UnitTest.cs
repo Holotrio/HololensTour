@@ -16,8 +16,8 @@ namespace TourBackend
         {
 
             var dict = new Dictionary<int, CodeObject>();
-            var cd1 = new CodeObject(90909, new[] { 1f, 2f, 3f }, new[] { 4f, 5f, 6f });
-            var cd2 = new CodeObject(890, new[] { 4f, 7f, 8f }, new[] { 1f, 19f, 3f }); // Just build to "random" CodeObjects
+            var cd1 = new CodeObject(90909, new[] { 1d, 2d, 3d }, new[] { 4d, 5d, 6d });
+            var cd2 = new CodeObject(890, new[] { 4d, 7d, 8d }, new[] { 1d, 19d, 3d }); // Just build to "random" CodeObjects
 
             dict.Add(90909, cd1);
             dict.Add(890, cd2);
@@ -44,9 +44,9 @@ namespace TourBackend
         public async Task SyncActor_needs_to_write_different_timestamps_for_different_writes()
         {
             var dict = new Dictionary<int, CodeObject>();
-            var cd1 = new CodeObject(5, new[] { 1f, 2f, 3f }, new[] { 4f, 5f, 6f });
-            var cd2 = new CodeObject(46, new[] { 4f, 7f, 8f }, new[] { 1f, 19f, 3f }); // Just build two "random" CodeObjects
-            var cd3 = new CodeObject(67, new[] { 57f, 34f, 124f }, new[] { 1235f,35f, 757f }); // Just build to "random" CodeObjects
+            var cd1 = new CodeObject(5, new[] { 1d, 2d, 3d }, new[] { 4d, 5d, 6d });
+            var cd2 = new CodeObject(46, new[] { 4d, 7d, 8d }, new[] { 1d, 19d, 3d }); // Just build two "random" CodeObjects
+            var cd3 = new CodeObject(67, new[] { 57d, 34d, 124d }, new[] { 1235d,35d, 757d }); // Just build to "random" CodeObjects
 
             dict.Add(5, cd1);
             dict.Add(46, cd2);
@@ -82,8 +82,8 @@ namespace TourBackend
         {
 
             var dict = new Dictionary<int, CodeObject>();
-            var cd1 = new CodeObject(45, new[] { 1f, 2f, 3f }, new[] { 4f, 5f, 6f });
-            var cd2 = new CodeObject(245, new[] { 4f, 7f, 8f }, new[] { 1f, 19f, 3f }); // Just build to "random" CodeObjects
+            var cd1 = new CodeObject(45, new[] { 1d, 2d, 3d }, new[] { 4d, 5d, 6d });
+            var cd2 = new CodeObject(245, new[] { 4d, 7d, 8d }, new[] { 1d, 19d, 3d }); // Just build to "random" CodeObjects
 
             dict.Add(45, cd1);
             dict.Add(245, cd2);
