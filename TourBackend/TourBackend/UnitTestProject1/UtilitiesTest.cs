@@ -345,7 +345,7 @@ namespace TourBackend
             // first get an bitmap
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path = Path.Combine(path, "Resources");
-            path = Path.Combine(path, "Screenshot_148_.bmp");
+            path = Path.Combine(path, "ArucoCode_ID_1_2_3_7_10.bmp");
             Stream testfile = File.OpenRead(path);
             var _testbitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(testfile);
 
@@ -377,42 +377,55 @@ namespace TourBackend
 
             // here we extract the translation vector out of the tvecs mat return value
             // which stored the values as doubles in the mat
-
             // Moritz: darauf achten, dass die Dimensionen stimmen! 
             // Generell können in rvecs/tvecs beliebig viele Einträge stehen.
-
-            double[] _tvecs = new double[3];            
-            tvecs.CopyTo<double>(_tvecs);
-            for(int i = 0; i < _tvecs.Length; ++i)
+            int idSize = outIDs.Size;
+            int tvecsRows = tvecs.Rows;
+            if (idSize == tvecsRows)
             {
-                Console.WriteLine("tvecs = " + _tvecs[i]);
+                for (int p = 0; p < tvecsRows; ++p)
+                {
+                        double[] _tvecs = new double[3];
+                        tvecs.Row(p).CopyTo<double>(_tvecs);
+                        for (int i = 0; i < _tvecs.Length; ++i)
+                        {
+                            Console.WriteLine("tvecs " + p + "= " + _tvecs[i]);
+                        }
+                }
             }
-
+                
             // here we extract the roation vector out of the rvecs mat return value
             // which stored the values as doubles in the mat
-            double[] _rvecs = new double[3];
-            rvecs.CopyTo<double>(_rvecs);
-            for (int i = 0; i < _rvecs.Length; ++i)
+            int rvecsRows = rvecs.Rows;
+            if (idSize == rvecsRows)
             {
-                Console.WriteLine("rvecs = " + _rvecs[i]);
+                for (int r = 0; r < rvecsRows; ++r)
+                {
+                    // first give out the rotation vector
+                    double[] _rvecs = new double[3];
+                    rvecs.Row(r).CopyTo<double>(_rvecs);
+                    for (int i = 0; i < _rvecs.Length; ++i)
+                    {
+                        Console.WriteLine("rvecs " + r + "= " + _rvecs[i]);
+                    }
+
+                    // then create the outputmatrix
+                    // here we create a rotation matrix out of the rotation vector, it is this a 3x3 matrix with
+                    // 9 elements and it is like: rotMat(x,y) = _rotmat(x+y-2)
+                    // which stored the values as doubles in the mat
+                    double[] _rotMat = new double[9];
+                    Mat rotMat = new Mat();
+                    Emgu.CV.CvInvoke.Rodrigues(rvecs.Row(r), rotMat, null);
+                    rotMat.CopyTo<double>(_rotMat);
+                    for (int i = 0; i < _rotMat.Length; ++i)
+                    {
+                        double help = i / 3;
+                        int index_x = (int)Math.Floor(help);
+                        int index_y = i % 3;
+                        Console.WriteLine("rotMat" + r + "(" + index_x + ", " + index_y + ") = " + _rotMat[i]);
+                    }
+                }
             }
-
-            // here we create a rotation matrix out of the rotation vector, it is this a 3x3 matrix with
-            // 9 elements and it is like: rotMat(x,y) = _rotmat(x+y-2)
-            // which stored the values as doubles in the mat
-
-            double[] _rotMat = new double[9];
-            Mat rotMat = new Mat();
-            Emgu.CV.CvInvoke.Rodrigues(rvecs, rotMat, null);
-            rotMat.CopyTo<double>(_rotMat);
-            for (int i = 0; i < _rotMat.Length; ++i)
-            {
-                double help = i / 3;
-                int index_x = (int) Math.Floor(help);
-                int index_y = i % 3;
-                Console.WriteLine("rotMat(" + index_x + ", " + index_y + ") = " + _rotMat[i]);
-            }
-
         }
     }
 }

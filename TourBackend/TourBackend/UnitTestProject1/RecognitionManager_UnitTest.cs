@@ -164,7 +164,7 @@ namespace TourBackend
             var msg = new NewFrameArrived(_messageID, _testbitmap);
 
             // now send this message to the recognitionManager and get the answer in the response variable
-            var response = await _pidTestRecognitionManager.RequestAsync<RespondNewFrameArrived>(msg, TimeSpan.FromSeconds(5));
+            var response = await _pidTestRecognitionManager.RequestAsync<RespondNewFrameArrived>(msg, TimeSpan.FromSeconds(10));
             
             // now check if we get the right answer meaning the right message id
             Assert.AreEqual(response.messageID, _messageID);

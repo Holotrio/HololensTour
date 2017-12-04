@@ -138,7 +138,7 @@ namespace TourBackend
             Mat rvecs = new Mat();
             Mat tvecs = new Mat();
 
-            // now get all the pose in tvecs and all rotations in rvecs
+            // now get all the pose in form of a translation vector in tvecs and all rotations in form of a rotation vector in rvecs
             Emgu.CV.Aruco.ArucoInvoke.EstimatePoseSingleMarkers(outCorners, markerLength, cameraMatrix, distcoeffs, rvecs, tvecs);
 
             // now update the internal dictionary with the new data
@@ -150,10 +150,12 @@ namespace TourBackend
         /// get the value true for their components isActive. Further the codeObjects should be updated with their
         /// current position and rotation as it was recognised in the FrameEvaluation Method
         /// </summary>
-        public void UpdateInternalDictionary(VectorOfInt _ids, Mat _positions, Mat _rotations)
+        public void UpdateInternalDictionary(VectorOfInt _ids, Mat _translationVectors, Mat _rotationVectors)
         {
-            // first get the data out of the Mats
-              // float[,] positions = new float[_ids.Size , 3];
+            // first define the parameters
+            int idSize = _ids.Size;
+            int tvecsRows = _translationVectors.Rows;
+            int rvecsRows = _rotationVectors.Rows;
 
             // iterate through the whole internal dictionary, to set all CodeObject.isActive default to false
             foreach (var entry in codeObjectIDToCodeObject)
@@ -166,12 +168,44 @@ namespace TourBackend
             {
                 if (codeObjectIDToCodeObject.ContainsKey(_ids[i]))
                 {
+                    // set first the isActive of the recognised CodeObject to true
                     codeObjectIDToCodeObject[_ids[i]].isActive = true;
 
-                    // codeObjectIDToCodeObject[_ids[i]].position[0];
-
-
-                    // codeObjectIDToCodeObject[_ids[i]].rotation = _rotations[i];
+                    // then update the position                       
+                    if (tvecsRows == idSize)
+                    {
+                        // first get the data out of the mat
+                        double[] translationVector = new double[3];
+                        _translationVectors.Row(i).CopyTo<double>(translationVector);
+                        // then iterate through the vector and update its position
+                        for (int p = 0; p < translationVector.Length; ++p)
+                        {
+                            codeObjectIDToCodeObject[_ids[i]].position[p] = translationVector[p];
+                        }
+                    }
+                    
+                    /*
+                    // and finally update the roation matrix of the codeObject
+                    if(rvecsRows == idSize)
+                    {
+                        // first create the rotation matrix still as a Mat
+                        Mat _rotMat = new Mat();
+                        Emgu.CV.CvInvoke.Rodrigues(_rotationVectors.Row(i), _rotMat, null);
+                        // then get the data out of the Mat
+                        double[] rotMat = new double[9];
+                        _rotMat.CopyTo<double>(rotMat);
+                        // then update the rotationMatrix
+                        for (int r = 0; r < rotMat.Length; ++r)
+                        {
+                            codeObjectIDToCodeObject[_ids[i]].rotation[r] = rotMat[r];
+                        }
+                    }
+                    */
+                    
+                }
+                else
+                {
+                    // there is a marker which is recognised but is not initialised in the dictionary, meaning it does not exist for our purpose
                 }
             }
         }
