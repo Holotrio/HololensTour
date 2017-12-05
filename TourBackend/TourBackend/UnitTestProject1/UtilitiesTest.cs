@@ -390,7 +390,7 @@ namespace TourBackend
             // first get an bitmap
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path = Path.Combine(path, "Resources");
-            path = Path.Combine(path, "ArucoCode_ID_1_8.bmp");
+            path = Path.Combine(path, "ArucoCode_ID_1_2_3_7_10.bmp");
             Stream testfile = File.OpenRead(path);
             var _testbitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(testfile);
 
@@ -470,6 +470,12 @@ namespace TourBackend
                         Console.WriteLine("rotMat" + r + "(" + index_x + ", " + index_y + ") = " + _rotMat[i]);
                     }
                 }
+            }
+
+            // give the corresponding outIDS to the console
+            for(int i = 0; i < outIDs.Size; ++i)
+            {
+                Console.WriteLine("The " + i + " - th element in the ID Array is:    " + outIDs[i]);
             }
         }
     }

@@ -36,11 +36,11 @@ namespace TourBackend
             // which contains of a dictionary and a messageID to know to which Request the Respond was
             var _msgRequestAll = new RequestAllVirtualObjects("RequestAll", TimeSpan.FromSeconds(1));
             var responseRequestAll = await _pidTestRecognitionManager.RequestAsync<RespondRequestAllVirtualObjects>(_msgRequestAll, TimeSpan.FromSeconds(1));
-            
+
             // here we actually test if the Call "RequestAllVirtualObjects" can what we intended
             // first we check if the response have the same messageID as the request had
             Assert.AreEqual("RequestAll", responseRequestAll.messageID);
-            
+
             // the respondDict should have three CodeObjects with ID 1, 5 and 7 in it
             Dictionary<int, CodeObject> expectedRespDict = new Dictionary<int, CodeObject>();
             expectedRespDict.Add(1, initialDict[1]);
@@ -66,11 +66,11 @@ namespace TourBackend
             // now send the message that codeObject 1 should be set active
             var _msgSetActiveCO1 = new SetActiveVirtualObject("SetActiveCO1", 1);
             var responseToSetActive = await _pidTestRecognitionManager.RequestAsync<RespondSetActiveVirtualObject>(_msgSetActiveCO1, TimeSpan.FromSeconds(1));
-            
+
             // now we should get the right messageID and the right CodeObject ID back
             Assert.AreEqual("SetActiveCO1", responseToSetActive.messageID);
             Assert.AreEqual(1, responseToSetActive.nowActiveVirtualObjectID);
-            
+
             // and then test if the data is at the current state in the dictionary
             // first make an request all call to the recognitionManager to get the whole Dictionary back
             var _msgRequestAll = new RequestAllVirtualObjects("RequestAll1", TimeSpan.FromSeconds(1));
@@ -165,7 +165,7 @@ namespace TourBackend
 
             // now send this message to the recognitionManager and get the answer in the response variable
             var response = await _pidTestRecognitionManager.RequestAsync<RespondNewFrameArrived>(msg, TimeSpan.FromSeconds(10));
-            
+
             // now check if we get the right answer meaning the right message id
             Assert.AreEqual(response.messageID, _messageID);
         }
@@ -244,15 +244,27 @@ namespace TourBackend
             // now check if we get the right answer meaning the right message id
             Assert.AreEqual(respondNewFrameArrived.messageID, _messageID);
 
-            // now check with the request all if the right changes were made in the dictionary
+            // check with the request all if the right objects are in the dictionary
             var requestAll = new RequestAllVirtualObjects("Request", TimeSpan.FromSeconds(1));
             var respondRequestAll = await _pidTestRecognitionManager.RequestAsync<RespondRequestAllVirtualObjects>(requestAll, TimeSpan.FromSeconds(1));
             Assert.AreEqual("Request", respondRequestAll.messageID);
             Assert.AreEqual(1, respondRequestAll.newCodeObjectIDToCodeObject.Count);
             Assert.AreEqual(true, respondRequestAll.newCodeObjectIDToCodeObject.ContainsKey(1));
 
-            // Remark: the position and rotation should be tested as well, that they are in the dict as we wanna them to have
-       }
+            // check that the translation vector of the codeobject is the same
+            double e = 0.0000000001d; // is the error we accept for the comparison of two double numbers
+            double[,] correctTranslations = Utils.HelpForTesting.GetTranslationsOfBitmapFile("ArucoCode_ID_1.bmp");
+            Assert.AreEqual(true, System.Math.Abs(correctTranslations[0, 0] - respondRequestAll.newCodeObjectIDToCodeObject[1].position[0]) < e);
+            Assert.AreEqual(true, System.Math.Abs(correctTranslations[0, 1] - respondRequestAll.newCodeObjectIDToCodeObject[1].position[1]) < e);
+            Assert.AreEqual(true, System.Math.Abs(correctTranslations[0, 2] - respondRequestAll.newCodeObjectIDToCodeObject[1].position[2]) < e);
+
+            // check that the rotation matrix is the same
+            double[,] correctRotMat = Utils.HelpForTesting.GetRotationMatricesOfBitmapFile("ArucoCode_ID_1.bmp");
+            for (int r = 0; r < 9; ++r)
+            {
+                Assert.AreEqual(true, System.Math.Abs(correctRotMat[0, r] - respondRequestAll.newCodeObjectIDToCodeObject[1].rotation[r]) < e);
+            }
+        }
 
         /// <summary>
         /// the idea here is that if the controlActor sends the message NewFrameArrived to the RecognitionManager (=RM), then 
@@ -294,7 +306,28 @@ namespace TourBackend
             Assert.AreEqual(true, respondRequestAll.newCodeObjectIDToCodeObject.ContainsKey(1));
             Assert.AreEqual(true, respondRequestAll.newCodeObjectIDToCodeObject.ContainsKey(8));
 
-            // Remark: the position and rotation should be tested as well, that they are in the dict as we wanna them to have
+            // check if the translation vectors are the ones we expect it to be
+            double e = 0.0000000001d; // is the error we accept for the comparison of two double numbers
+            double[,] correctTranslations = Utils.HelpForTesting.GetTranslationsOfBitmapFile("ArucoCode_ID_1_8.bmp");
+            for (int p = 0; p < 3; ++p)
+            {
+                Assert.AreEqual(true, System.Math.Abs(correctTranslations[0, p] - respondRequestAll.newCodeObjectIDToCodeObject[1].position[p]) < e);
+            }
+            for (int p = 0; p < 3; ++p)
+            {
+                Assert.AreEqual(true, System.Math.Abs(correctTranslations[1, p] - respondRequestAll.newCodeObjectIDToCodeObject[8].position[p]) < e);
+            }
+
+            // check if the rotation matrices are as expected
+            double[,] correctRotMat = Utils.HelpForTesting.GetRotationMatricesOfBitmapFile("ArucoCode_ID_1_8.bmp");
+            for(int r = 0; r < 9; ++r)
+            {
+                Assert.AreEqual(true, System.Math.Abs(correctRotMat[0, r] - respondRequestAll.newCodeObjectIDToCodeObject[1].rotation[r]) < e);
+            }
+            for (int r = 0; r < 9; ++r)
+            {
+                Assert.AreEqual(true, System.Math.Abs(correctRotMat[1, r] - respondRequestAll.newCodeObjectIDToCodeObject[8].rotation[r]) < e);
+            }
         }
 
         /// <summary>
@@ -340,8 +373,56 @@ namespace TourBackend
             Assert.AreEqual(true, respondRequestAll.newCodeObjectIDToCodeObject.ContainsKey(7));
             Assert.AreEqual(true, respondRequestAll.newCodeObjectIDToCodeObject.ContainsKey(10));
 
+            // check if the translation vectors are the ones we expect it to be
+            double e = 0.0000000001d; // is the error we accept for the comparison of two double numbers
+            double[,] correctTranslations = Utils.HelpForTesting.GetTranslationsOfBitmapFile("ArucoCode_ID_1_2_3_7_10.bmp");
+            // see TestEmguCVEstimatePoseSingleMarker output with the input file "ArucoCode_ID_1_2_3_7_10.bmp " why we have 
+            // the following ID order in the correctTranslations Array
+            for (int p = 0; p < 3; ++p)
+            {
+                Assert.AreEqual(true, System.Math.Abs(correctTranslations[0, p] - respondRequestAll.newCodeObjectIDToCodeObject[7].position[p]) < e);
+            }
+            for (int p = 0; p < 3; ++p)
+            {
+                Assert.AreEqual(true, System.Math.Abs(correctTranslations[1, p] - respondRequestAll.newCodeObjectIDToCodeObject[2].position[p]) < e);
+            }
+            for (int p = 0; p < 3; ++p)
+            {
+                Assert.AreEqual(true, System.Math.Abs(correctTranslations[2, p] - respondRequestAll.newCodeObjectIDToCodeObject[3].position[p]) < e);
+            }
+            for (int p = 0; p < 3; ++p)
+            {
+                Assert.AreEqual(true, System.Math.Abs(correctTranslations[3, p] - respondRequestAll.newCodeObjectIDToCodeObject[1].position[p]) < e);
+            }
+            for (int p = 0; p < 3; ++p)
+            {
+                Assert.AreEqual(true, System.Math.Abs(correctTranslations[4, p] - respondRequestAll.newCodeObjectIDToCodeObject[10].position[p]) < e);
+            }
 
-            // Remark: the position and rotation should be tested as well, that they are in the dict as we wanna them to have
+            // check if the rotation matrices are as expected
+            double[,] correctRotMat = Utils.HelpForTesting.GetRotationMatricesOfBitmapFile("ArucoCode_ID_1_2_3_7_10.bmp");
+            // see TestEmguCVEstimatePoseSingleMarker output with the input file "ArucoCode_ID_1_2_3_7_10.bmp " why we have 
+            // the following ID order in the correctRotMat Array
+            for (int r = 0; r < 9; ++r)
+            {
+                Assert.AreEqual(true, System.Math.Abs(correctRotMat[0, r] - respondRequestAll.newCodeObjectIDToCodeObject[7].rotation[r]) < e);
+            }
+            for (int r = 0; r < 9; ++r)
+            {
+                Assert.AreEqual(true, System.Math.Abs(correctRotMat[1, r] - respondRequestAll.newCodeObjectIDToCodeObject[2].rotation[r]) < e);
+            }
+            for (int r = 0; r < 9; ++r)
+            {
+                Assert.AreEqual(true, System.Math.Abs(correctRotMat[2, r] - respondRequestAll.newCodeObjectIDToCodeObject[3].rotation[r]) < e);
+            }
+            for (int r = 0; r < 9; ++r)
+            {
+                Assert.AreEqual(true, System.Math.Abs(correctRotMat[3, r] - respondRequestAll.newCodeObjectIDToCodeObject[1].rotation[r]) < e);
+            }
+            for (int r = 0; r < 9; ++r)
+            {
+                Assert.AreEqual(true, System.Math.Abs(correctRotMat[4, r] - respondRequestAll.newCodeObjectIDToCodeObject[10].rotation[r]) < e);
+            }
         }
     }
 }
