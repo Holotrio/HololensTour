@@ -67,7 +67,8 @@ namespace TourBackend
             var camobj = new CameraFeedSyncObject("test");
             var debugPID = new PID();
 
-            CodeObject[] codeobjs = new CodeObject[5];
+            CodeObject[] codeobjs = new CodeObject[1];
+            codeobjs.SetValue(new CodeObject(),0);
 
             // There is a constructor for debugging which allows to view the PID of the chosen Actor
             // the int argument of the constructor is interpreted as the actor which is to be linked to debugPID

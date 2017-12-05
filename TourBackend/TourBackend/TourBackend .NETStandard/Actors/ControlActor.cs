@@ -39,6 +39,10 @@ namespace TourBackend
             syncobj = _syncobj;
             video = _video;
             markers = _markers;
+            this.idToCodeObject = new Dictionary<int, CodeObject>();
+            foreach (var entry in markers) {
+                idToCodeObject.Add(entry.id, entry);
+            }
         }
 
 
@@ -134,7 +138,7 @@ namespace TourBackend
             this.recognitionManager = Actor.Spawn(recogprops);
 
             var cameraFeedSyncprops = Actor.FromProducer(() => new CameraFeedActor("camerafeedactor", video, self));
-            this.recognitionManager = Actor.Spawn(cameraFeedSyncprops);
+            this.cameraFeedSyncActor = Actor.Spawn(cameraFeedSyncprops);
         }
 
         /// <summary>
@@ -205,7 +209,7 @@ namespace TourBackend
 
                 /*This message should arrive everytime a new frame has been deposited on the CameraFeedSyncObject*/
                 case NewFrameArrived n:
-                    recognitionManager.Tell(n);
+                    recognitionManager.Request(new NewFrameArrived(n.id, n.bitmap), self);
                     Console.WriteLine("ControlActor says: Frame arrived");
                     break;
 

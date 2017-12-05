@@ -24,7 +24,6 @@ namespace TourBackend
             var cd1 = new CodeObject(1, new[] { -0.0716567589573924d, 0.000621125026751875d, 0.421481938204676d }, new[] { 0.997540310976068d, -0.00352611230630855d, -0.0700063890639387d, -0.00696372073051795d, -0.99877837158065d, -0.0489210696560579d, -0.0697483660837701d, 0.0492882439807792d, -0.996346242244098d }, true);
             CodeObject[] codeobjs = new CodeObject[1];
             codeobjs.SetValue(cd1,0);
-
             dict.Add(1, cd1);
 
             FrameWork fw = new FrameWork(syncobject, camerafeedsyncobject, codeobjs);
@@ -49,10 +48,12 @@ namespace TourBackend
             // See if the output has been updated within 1 second
             Stopwatch stop = new Stopwatch();
             stop.Start();
-            while (stop.ElapsedMilliseconds < 5000 && syncobject.dict != dict) {
+            while (stop.ElapsedMilliseconds < 20000 && syncobject.dict.ContainsKey(1) != true) {
                 Thread.Sleep(5); // Arbitrary sleep length
             }
             stop.Stop();
+
+            //Console.WriteLine(syncobject.dict[1].id);
 
             // Fail test if syncobj hasn't been updated
             Assert.IsTrue(syncobject.dict.ContainsKey(1));

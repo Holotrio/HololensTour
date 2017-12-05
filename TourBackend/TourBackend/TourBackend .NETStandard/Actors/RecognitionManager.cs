@@ -38,6 +38,7 @@ namespace TourBackend
                 // CodeObjects in it which have the isActive == true
                 case RequestAllVirtualObjects r:
                     {
+                        
                         // first create a new empty dictionary
                         Dictionary<int, CodeObject> returnDict = new Dictionary<int, CodeObject>();
                         // for each codeObject in the dictionary, add the key value pair into the returnDict
@@ -60,6 +61,7 @@ namespace TourBackend
                 // send back the response to the sender
                 case SetActiveVirtualObject s:
                     {
+                        
                         if (codeObjectIDToCodeObject.ContainsKey(s.toBeActiveVirtualObjectID))
                         {
                             codeObjectIDToCodeObject[s.toBeActiveVirtualObjectID].isActive = true;
@@ -81,6 +83,7 @@ namespace TourBackend
                 // send back the response back to the sender.
                 case SetInActiveVirtualObject s:
                     {
+                        
                         if (codeObjectIDToCodeObject.ContainsKey(s.toBeInActiveVirtualObjectID))
                         {
                             codeObjectIDToCodeObject[s.toBeInActiveVirtualObjectID].isActive = false;
@@ -104,7 +107,10 @@ namespace TourBackend
                         FrameEvaluation(n.bitmap);
 
                         // after the successfull evaluation respond to the control Actor
+
                         context.Sender.Tell(new RespondNewFrameArrived(n.id));
+
+
                     }
                     break;
             }
@@ -126,7 +132,7 @@ namespace TourBackend
 
             // now detect the markers in the image bitmap
             Emgu.CV.Aruco.ArucoInvoke.DetectMarkers(_image, MarkerTypeToFind, outCorners, outIDs, _detectorParameters, null);
-
+            
             // then define all arguments for the estimatePoseSingleMarkers function call
             float markerLength = 0.1f; // set the default markerLength which is usually given in the unit meter
             Mat cameraMatrix = new Mat();
@@ -140,9 +146,10 @@ namespace TourBackend
 
             // now get all the pose in form of a translation vector in tvecs and all rotations in form of a rotation vector in rvecs
             Emgu.CV.Aruco.ArucoInvoke.EstimatePoseSingleMarkers(outCorners, markerLength, cameraMatrix, distcoeffs, rvecs, tvecs);
-
+            
             // now update the internal dictionary with the new data
             UpdateInternalDictionary(outIDs, tvecs, rvecs);
+            
         }
 
         /// <summary>
@@ -158,7 +165,7 @@ namespace TourBackend
             int rvecsRows = _rotationVectors.Rows;
 
             // iterate through the whole internal dictionary, to set all CodeObject.isActive default to false
-            foreach (var entry in codeObjectIDToCodeObject)
+            foreach (KeyValuePair<int, CodeObject> entry in codeObjectIDToCodeObject)
             {
                 entry.Value.isActive = false;
             }
@@ -168,6 +175,7 @@ namespace TourBackend
             {
                 if (codeObjectIDToCodeObject.ContainsKey(_ids[i]))
                 {
+                    
                     // set first the isActive of the recognised CodeObject to true
                     codeObjectIDToCodeObject[_ids[i]].isActive = true;
 
@@ -183,13 +191,13 @@ namespace TourBackend
                             codeObjectIDToCodeObject[_ids[i]].position[p] = translationVector[p];
                         }
                     }
-                    
+
                     // and finally update the roation matrix of the codeObject
-                    if(rvecsRows == idSize)
+                    if (rvecsRows == idSize)
                     {
                         // first create the rotation matrix still as a Mat
                         Mat _rotMat = new Mat();
-                        Emgu.CV.CvInvoke.Rodrigues(_rotationVectors.Row(i), _rotMat, null);                         
+                        Emgu.CV.CvInvoke.Rodrigues(_rotationVectors.Row(i), _rotMat, null);
                         // then get the data out of the Mat
                         double[] rotMat = new double[9];
                         _rotMat.CopyTo<double>(rotMat);
@@ -197,14 +205,17 @@ namespace TourBackend
                         for (int r = 0; r < rotMat.Length; ++r)
                         {
                             codeObjectIDToCodeObject[_ids[i]].rotation[r] = rotMat[r];
-                        }                        
-                    }                    
+                        }
+                    }
                 }
                 else
                 {
                     // there is a marker which is recognised but is not initialised in the dictionary, meaning it does not exist for our purpose
+                    
                 }
+
             }
+
         }
 
     }

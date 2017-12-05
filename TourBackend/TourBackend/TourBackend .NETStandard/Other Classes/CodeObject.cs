@@ -30,6 +30,7 @@ namespace TourBackend
 
         public CodeObject()
         {
+            isActive = true;
         }
 
         public CodeObject(int _objectid, double[] _position, double[] _rotation, bool _isActive)
@@ -45,6 +46,7 @@ namespace TourBackend
             id = _objectid; ;
             position = _position;
             rotation = _rotation;
+            isActive = true;
         }
     }
 }
