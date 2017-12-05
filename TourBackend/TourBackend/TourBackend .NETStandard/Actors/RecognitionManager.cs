@@ -13,36 +13,45 @@ using Emgu.CV.Util;
 
 namespace TourBackend
 {
+    /// <summary>
+    /// The Recognition Manager Actor evaluates the frames and does the bookkeeping of all Aruco Code Markers with their
+    /// properties which are stored as CodeObjects. The CameraMatrix, the Distortion Coefficients and the Aruco Code Marker
+    /// length is defined in the method "FrameEvaluation" which is also in defined in the Recognition Manager. These parameters
+    /// which are needed by EmguCV for the recognition can vary and if you have to adjust them, do it there.
+    /// </summary>
     public class RecognitionManager : IActor
     {
-        // this is the id of this actor
         protected string Id { get; }
-        // this dictionary is created when the recognition manager gets initialized by the controlactor and
-        // it stays static meaning that the keys to value relations will not change. The only thing that changes
-        // are the codeObject itself id est their properties.
+
+        // this dictionary is created when the recognition manager gets initialized by the control actor and
+        // it stays static meaning that the key to value relations will not change. The only thing that changes
+        // are the codeObject properties like rotation, position, isActive...
         public Dictionary<int, CodeObject> codeObjectIDToCodeObject = new Dictionary<int, CodeObject>();
-        // here is the constructor
+
+        // constructor
         public RecognitionManager(string id, Dictionary<int, CodeObject> _dict)
         {
             Id = id;
             codeObjectIDToCodeObject = _dict;
         }
-        // here we write all actions if we receive a certain message
+
+        // here we write all reactions if we receive a certain message from any other actor
         public Task ReceiveAsync(IContext context)
         {
-            var msg = context.Message;
-            switch (msg)
+            var message = context.Message;
+
+            // here we check of which type the message is and then we react specifically. the message types are all defined
+            // in the folder Protocols
+            switch (message)
             {
                 // the idea here is that if we get the requestall virtual objects we check what we have in 
                 // the dictionary codeObjectIDToCodeObject and then we create a new Dictionary with only the 
                 // CodeObjects in it which have the isActive == true
                 case RequestAllVirtualObjects r:
-                    {
-                        
-                        // first create a new empty dictionary
+                                            
+                        // first create a new empty dictionary for the response
                         Dictionary<int, CodeObject> returnDict = new Dictionary<int, CodeObject>();
-                        // for each codeObject in the dictionary, add the key value pair into the returnDict
-                        // if and only if his isActive == true
+                       
                         foreach (var entry in codeObjectIDToCodeObject)
                         {
                             if (entry.Value.isActive == true)
@@ -50,91 +59,90 @@ namespace TourBackend
                                 returnDict.Add(entry.Key, entry.Value);
                             }
                         }
+
                         // if we now have the return Dictionary, send the Respond message back to the sender
-                        var _respondToRequestMessage = new RespondRequestAllVirtualObjects(r.messageID, returnDict);
-                        context.Sender.Tell(_respondToRequestMessage);
-                    }
+                        context.Sender.Tell(new RespondRequestAllVirtualObjects(r.messageID, returnDict));
+                    
                     break;
 
                 // the idea here is if we get the setActive message we should look up in the dictionary if the 
                 // requested CodeObject does exitst. If it exists we should set the isActive to true. And then 
-                // send back the response to the sender
+                // send back the response to the sender. If it does not exist in the internal dictionary we should 
+                // respond with a failedTo message.
                 case SetActiveVirtualObject s:
-                    {
-                        
+                                            
                         if (codeObjectIDToCodeObject.ContainsKey(s.toBeActiveVirtualObjectID))
                         {
                             codeObjectIDToCodeObject[s.toBeActiveVirtualObjectID].isActive = true;
                             // respond to the sender
-                            var _respondMsg = new RespondSetActiveVirtualObject(s.messageID, s.toBeActiveVirtualObjectID);
-                            context.Sender.Tell(_respondMsg);
+                            context.Sender.Tell(new RespondSetActiveVirtualObject(s.messageID, s.toBeActiveVirtualObjectID));
                         }
                         else
                         {
                             // respond to the sender with a failedToMessage
-                            var _failMsg = new FailedToSetActiveVirtualObject(s.messageID);
-                            context.Sender.Tell(_failMsg);
+                            context.Sender.Tell(new FailedToSetActiveVirtualObject(s.messageID));
                         }
-                    }
+                    
                     break;
 
                 // the idea here is if we get the setInActive message we should look up in the dictionary if the 
                 // requested CodeObject does exitst. If it exists we should set the isActive to false. And then 
-                // send back the response back to the sender.
+                // send back the response back to the sender. If it does not exist in the internal dictionary we should 
+                // respond with a failedTo message.
                 case SetInActiveVirtualObject s:
-                    {
-                        
+                                          
                         if (codeObjectIDToCodeObject.ContainsKey(s.toBeInActiveVirtualObjectID))
                         {
                             codeObjectIDToCodeObject[s.toBeInActiveVirtualObjectID].isActive = false;
                             // respond to the sender
-                            var _respondMsg = new RespondSetInActiveVirtualObject(s.messageID, s.toBeInActiveVirtualObjectID);
-                            context.Sender.Tell(_respondMsg);
+                            context.Sender.Tell(new RespondSetInActiveVirtualObject(s.messageID, s.toBeInActiveVirtualObjectID));
                         }
                         else
                         {
                             // respond to the sender with a failedToMessage
-                            var _failMsg = new FailedToSetInActiveVirtualObject(s.messageID);
-                            context.Sender.Tell(_failMsg);
+                            context.Sender.Tell(new FailedToSetInActiveVirtualObject(s.messageID));
                         }
-                    }
+                    
                     break;
+
                 // the idea here is if the recognition manager gets this message, he takes the frame, evaluate it and
-                // then update the internal dictionary. having done this he should reply to the controlActor that all is good
+                // then update the internal dictionary. having done this he should reply to the controlActor that all went well
                 case NewFrameArrived n:
-                    {
+                    
                         // do the work here with the recognition of the frame
                         FrameEvaluation(n.bitmap);
 
                         // after the successfull evaluation respond to the control Actor
-
                         context.Sender.Tell(new RespondNewFrameArrived(n.id));
-
-
-                    }
+                    
                     break;
             }
             return Actor.Done;
         }
 
         /// <summary>
-        /// the idea here is that we use this function to recognize the markers in the bitmap and update then all
-        /// markers in the dictionary with their position and rotation etc. 
+        /// use this method to recognize the aruco code markers in the bitmap (frame) and update then all
+        /// markers in the dictionary with their corresponding new properties according to the information which is
+        /// in the frame.
         /// </summary>
+        /// <param name="_bitmap">
+        /// this is the frame, the photo which gets evaluated. it has to be of the type System.Drawing.Bitmap
+        /// </param>
         public void FrameEvaluation(Bitmap _bitmap)
         {
-            // first set all arguments for the DetectMarkers function call
+            // first set all arguments for the DetectMarkers method call
             Emgu.CV.Image<Bgr, Byte> _image = Utils.BitmapToImage.CreateImagefromBitmap(_bitmap);
             var MarkerTypeToFind = new Dictionary(Dictionary.PredefinedDictionaryName.DictArucoOriginal);
             var outCorners = new VectorOfVectorOfPointF();
             var outIDs = new VectorOfInt();
             DetectorParameters _detectorParameters = DetectorParameters.GetDefault();
 
-            // now detect the markers in the image bitmap
+            // now detect the markers in the image bitmap and for further information look up the EmguCv documentation
             Emgu.CV.Aruco.ArucoInvoke.DetectMarkers(_image, MarkerTypeToFind, outCorners, outIDs, _detectorParameters, null);
             
-            // then define all arguments for the estimatePoseSingleMarkers function call
-            float markerLength = 0.1f; // set the default markerLength which is usually given in the unit meter
+            // then define all arguments for the estimatePoseSingleMarkers method call
+            float markerLength = 0.1f; // set the default markerLength which is usually given in the unit meters
+            // the cameraMatrix and distortion coefficients are the one for the hololens. the data is from: https://github.com/qian256/HoloLensCamCalib/blob/master/near/hololens896x504.yaml
             Mat cameraMatrix = new Mat();
             cameraMatrix.Create(3, 3, Emgu.CV.CvEnum.DepthType.Cv32F, 1);
             cameraMatrix.SetTo(new[] { 1039.7024546115156f, 0.0f, 401.9889542361556f, 0.0f, 1038.5598693279526f, 179.02511993572065f, 0.0f, 0.0f, 11.0f });
@@ -145,11 +153,11 @@ namespace TourBackend
             Mat tvecs = new Mat();
 
             // now get all the pose in form of a translation vector in tvecs and all rotations in form of a rotation vector in rvecs
+            // and for further information look up the EmguCv documentation or the description of the method "UpdateInternalDictionary"
             Emgu.CV.Aruco.ArucoInvoke.EstimatePoseSingleMarkers(outCorners, markerLength, cameraMatrix, distcoeffs, rvecs, tvecs);
             
             // now update the internal dictionary with the new data
-            UpdateInternalDictionary(outIDs, tvecs, rvecs);
-            
+            UpdateInternalDictionary(outIDs, tvecs, rvecs);            
         }
 
         /// <summary>
@@ -157,9 +165,22 @@ namespace TourBackend
         /// get the value true for their components isActive. Further the codeObjects should be updated with their
         /// current position and rotation as it was recognised in the FrameEvaluation Method
         /// </summary>
+        /// <param name="_ids">
+        /// has all the ID's of the recognised ArucoCodeMarkers in the frame unordered in it. the type of the ID's are only integers
+        /// </param>
+        /// <param name="_translationVectors">
+        /// has all translationVectors of the recognised ArucoCodeMarkers in the frame in it. For each marker there are 3 double values
+        /// which describe the translation along the axis x,y and z stored like [i,0] = x , [i,1] = y and [i,2] = z. The order which marker is 
+        /// in which row is exactly according to the order of the _ids vectorOfInt.
+        /// </param>
+        /// <param name="_rotationVectors">
+        /// has all rotationVectors of the recognised ArucoCodeMarkers in the frame in it. For each marker there are 3 double values
+        /// which describe the rotation. they form a vector. its direction describes the rotation axis and its length defines the rotation 
+        /// in radian degree. The order which marker is in which row is exactly according to the order of the _ids vectorOfInt.
+        /// </param>
         public void UpdateInternalDictionary(VectorOfInt _ids, Mat _translationVectors, Mat _rotationVectors)
         {
-            // first define the parameters
+            // first define the parameters to be able to test them in a boolean expression
             int idSize = _ids.Size;
             int tvecsRows = _translationVectors.Rows;
             int rvecsRows = _rotationVectors.Rows;
@@ -174,8 +195,7 @@ namespace TourBackend
             for (int i = 0; i < _ids.Size; ++i)
             {
                 if (codeObjectIDToCodeObject.ContainsKey(_ids[i]))
-                {
-                    
+                {                    
                     // set first the isActive of the recognised CodeObject to true
                     codeObjectIDToCodeObject[_ids[i]].isActive = true;
 
@@ -210,13 +230,9 @@ namespace TourBackend
                 }
                 else
                 {
-                    // there is a marker which is recognised but is not initialised in the dictionary, meaning it does not exist for our purpose
-                    
+                    // there is a marker which is recognised but is not initialised in the dictionary, meaning it does not exist for our purpose and therefore we did not implement a behavior for this case                    
                 }
-
             }
-
         }
-
     }
 }
