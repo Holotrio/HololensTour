@@ -13,11 +13,10 @@ namespace TourBackend
     {
         /// <summary>
         /// The idea here is to test that if the conrtrolActor asks the recognitionManager
-        /// to get all CodeObjects, that are in the current tourState (meaning the setActive bool is true,
-        /// the controlActor gets a dictionary back. The dictionary consists of an CodeObjectID as a key and 
+        /// to get all CodeObjects which have the setActive bool is true, the control actor gets the codeobjects
+        /// in form of a dictionary back. The dictionary consists of an CodeObjectID as a key and 
         /// the CodeObject itself as a value.
         /// </summary>
-        /// <returns></returns>
         [TestMethod]
         public async Task Control_Asks_RecognitionManager_RequestAllVirtualObjects()
         // for the RequestAsync method call we need firstly an async keyword in the declaration of the Task
@@ -53,7 +52,6 @@ namespace TourBackend
         /// VirtualObject. The Recognition Manager should response with the messageID of the SetActive Command
         /// and the VirtualObjectID of the now active VirtualObject
         /// </summary>
-        /// <returns></returns>
         [TestMethod]
         public async Task Control_Asks_RecognitionManager_To_SetActiveVirtualObject()
         {
@@ -92,7 +90,6 @@ namespace TourBackend
         /// VirtualObject. The Recognition Manager should response with the messageID of the SetInActive Command
         /// and the VirtualObjectID of the now inactive VirtualObject
         /// </summary>
-        /// <returns></returns>
         [TestMethod]
         public async Task Control_Asks_RecognitionManager_To_SetInActiveVirtualObject()
         {
@@ -140,7 +137,6 @@ namespace TourBackend
         /// with this Frame and if he is finished he should answer with the message RespondNewframeArrived.
         /// THIS TEST ONLY TESTS THE RESPOND MESSAGE IS CORRECTLY BUT NOT THAT THE EVALUATION OF THE FRAME WAS RIGHT!!!
         /// </summary>
-        /// <returns></returns>
         [TestMethod]
         public async Task Control_forwards_message_NewFrameArrived_to_the_recognitionManager()
         {

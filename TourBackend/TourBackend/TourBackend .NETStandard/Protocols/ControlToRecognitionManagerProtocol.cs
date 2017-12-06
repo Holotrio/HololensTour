@@ -113,13 +113,13 @@ namespace TourBackend
     /// </summary>
     public class CreateNewVirtualObject
     {
-        public CodeObject codeObject;
+        public CodeObject codeObjectToBeCreated;
         public string messageID;
 
-        public CreateNewVirtualObject(string _messageID, CodeObject _codeObject)
+        public CreateNewVirtualObject(string _messageID, CodeObject _codeObjectToBeCreated)
         {
             messageID = _messageID;
-            codeObject = _codeObject;
+            codeObjectToBeCreated = _codeObjectToBeCreated;
         }
     }
 
