@@ -190,14 +190,6 @@ namespace TourBackend
             Assert.AreEqual(testObject.messageID, _messageID);
         }
 
-        [TestMethod]
-        public void FailedToRequestAllVirtualObjects_Constructor_must_create_object()
-        {
-            string _messageID = "messageID";
-            var testObject = new FailedToRequestAllVirtualObjects(_messageID);
-            Assert.AreEqual(testObject.messageID, _messageID);
-        }
-
         /* Test all constructors of the failures to the commands. Second the ones for the not nano-case. */
 
         [TestMethod]
@@ -259,9 +251,8 @@ namespace TourBackend
             double[] _rotation = { 1d, 2.3d, 34d, 0.5d, 2d, 3d, 8.9d, 0.9d, 2.1d };
             bool _isActive = false;
             CodeObject _codeObject = new CodeObject(_codeObjectID, _position, _rotation, _isActive);
-            var msg = new CreateNewVirtualObject(_messageID, _codeObjectID, _codeObject);
+            var msg = new CreateNewVirtualObject(_messageID, _codeObject);
             Assert.AreEqual(msg.messageID, _messageID);
-            Assert.AreEqual(msg.codeObjectID, _codeObjectID);
             Assert.AreEqual(msg.codeObject, _codeObject);
             Assert.AreEqual(msg.codeObject.id, _codeObjectID);
         }
@@ -272,9 +263,9 @@ namespace TourBackend
         public void RespondCreateNewVirtualObject_Constructor_must_create_object()
         {
             string _messageID = "Create1";
-            var msg = new RespondCreateNewVirtualObject(_messageID);
+            int _isNowCreatedVirtualObjectID = 1;
+            var msg = new RespondCreateNewVirtualObject(_messageID, _isNowCreatedVirtualObjectID);
             Assert.AreEqual(msg.messageID, _messageID);
         }
-
     }
 }
