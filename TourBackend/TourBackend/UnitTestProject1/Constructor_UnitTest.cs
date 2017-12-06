@@ -98,8 +98,7 @@ namespace TourBackend
         [TestMethod]
         public void RespondRequestAllVirtualObjects_must_be_correctly_constructed()
         {
-            Dictionary<int, CodeObject> _dict = new Dictionary<int, CodeObject>();
-            _dict.Add(5, null); // insert a key value pair with a codeObjectID and a codeObject which is null...
+            Dictionary<int, CodeObject> _dict = new Dictionary<int, CodeObject>(5,null); // creates a dictionary and inserts a key value pair with a codeObjectID 5 and a codeObject which is null...
             var testobject = new RespondRequestAllVirtualObjects("_id", _dict);
 
             // test the constructor

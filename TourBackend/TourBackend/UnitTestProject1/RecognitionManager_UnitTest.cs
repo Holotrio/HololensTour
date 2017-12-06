@@ -8,14 +8,19 @@ using System.IO;
 
 namespace TourBackend
 {
+    /// <summary>
+    /// This class test the units of the recognition manager. Every message type the Recognition manager
+    /// can receive results in a certain action of him. Test that the right actions were made for the 
+    /// corresponding message type.
+    /// </summary>
     [TestClass]
     public class RecognititonManager_UnitTest
     {
         /// <summary>
         /// The idea here is to test that if the conrtrolActor asks the recognitionManager
-        /// to get all CodeObjects which have the setActive bool is true, the control actor gets the codeobjects
-        /// in form of a dictionary back. The dictionary consists of an CodeObjectID as a key and 
-        /// the CodeObject itself as a value.
+        /// to get all CodeObjects, which have the setActive bool is true. The control actor gets the codeobjects
+        /// in form of a dictionary back. The dictionary consists of CodeObjectID's as keys and 
+        /// the CodeObjects themselves as values.
         /// </summary>
         [TestMethod]
         public async Task Control_Asks_RecognitionManager_RequestAllVirtualObjects()
@@ -24,33 +29,39 @@ namespace TourBackend
             // create the testrecognition manager and the dictionary with all the initialized markers in it. 
             // But all have isActive = false...
             Dictionary<int, CodeObject> initialDict = Utils.HelpForTesting.CreateDictionaryForInitialization(10);
+            // to test properly we need some activated CodeObjects to simulate the usecase...
             initialDict[1].isActive = true;
             initialDict[5].isActive = true;
             initialDict[7].isActive = true;
             var _propsTestRecognitionManager = Actor.FromProducer(() => new RecognitionManager("RecognitionManager", initialDict));
             var _pidTestRecognitionManager = Actor.Spawn(_propsTestRecognitionManager);
 
-            // here we really do now the request from the testControlActor to the recognitionManager and we store
-            // the respond to the request in response where this must be a object of the class RespondRequestAllVirtualObjects
-            // which contains of a dictionary and a messageID to know to which Request the Respond was
+            // here we really do now the request from the "testControlActor" to the recognitionManager and we store
+            // the respond to the request in the responseRequestAll, where this must be a object of the class RespondRequestAllVirtualObjects
             var _msgRequestAll = new RequestAllVirtualObjects("RequestAll", TimeSpan.FromSeconds(1));
             var responseRequestAll = await _pidTestRecognitionManager.RequestAsync<RespondRequestAllVirtualObjects>(_msgRequestAll, TimeSpan.FromSeconds(1));
 
-            // here we actually test if the Call "RequestAllVirtualObjects" can what we intended
-            // first we check if the response have the same messageID as the request had
+            // we check if the response have the same messageID as the request had
             Assert.AreEqual("RequestAll", responseRequestAll.messageID);
 
             // the respondDict should have three CodeObjects with ID 1, 5 and 7 in it
-            Dictionary<int, CodeObject> expectedRespDict = new Dictionary<int, CodeObject>();
-            expectedRespDict.Add(1, initialDict[1]);
-            expectedRespDict.Add(5, initialDict[5]);
-            expectedRespDict.Add(7, initialDict[7]);
-            CollectionAssert.AreEqual(expectedRespDict, responseRequestAll.newCodeObjectIDToCodeObject);
+            Dictionary<int, CodeObject> expectedRespDict = new Dictionary<int, CodeObject>
+            {
+                { 1, initialDict[1] },
+                { 5, initialDict[5] },
+                { 7, initialDict[7] }
+            };
+
+            CollectionAssert.AreEqual(expectedRespDict, responseRequestAll.newCodeObjectIDToCodeObject); // with the collectionAssert we can compare whole dictionaries and not only primitive values
         }
+
         /// <summary>
         /// The idea here is that we send a message to the Recognition Manager to SetActive a specific 
-        /// VirtualObject. The Recognition Manager should response with the messageID of the SetActive Command
-        /// and the VirtualObjectID of the now active VirtualObject
+        /// VirtualObject meaning the virtual representation of an aruco code marker. The Recognition 
+        /// Manager should response with the messageID of the SetActive Command and the VirtualObjectID 
+        /// of the now active VirtualObject. if the VirtualObject of interest does not exist in the
+        /// internal dictionary of the recognition manager, the control actor should receive a failed to
+        /// do this taks message.
         /// </summary>
         [TestMethod]
         public async Task Control_Asks_RecognitionManager_To_SetActiveVirtualObject()
@@ -61,22 +72,24 @@ namespace TourBackend
             var _propsTestRecognitionManager = Actor.FromProducer(() => new RecognitionManager("RecognitionManager", initialDict));
             var _pidTestRecognitionManager = Actor.Spawn(_propsTestRecognitionManager);
 
-            // now send the message that codeObject 1 should be set active
+            // send the message that codeObject with ID = 1 should be set active
             var _msgSetActiveCO1 = new SetActiveVirtualObject("SetActiveCO1", 1);
             var responseToSetActive = await _pidTestRecognitionManager.RequestAsync<RespondSetActiveVirtualObject>(_msgSetActiveCO1, TimeSpan.FromSeconds(1));
 
-            // now we should get the right messageID and the right CodeObject ID back
+            // we should get the right messageID and the right CodeObject ID back
             Assert.AreEqual("SetActiveCO1", responseToSetActive.messageID);
             Assert.AreEqual(1, responseToSetActive.nowActiveVirtualObjectID);
 
-            // and then test if the data is at the current state in the dictionary
+            // test if the dictionary is also up to date
             // first make an request all call to the recognitionManager to get the whole Dictionary back
             var _msgRequestAll = new RequestAllVirtualObjects("RequestAll1", TimeSpan.FromSeconds(1));
             var responseToRequestAll = await _pidTestRecognitionManager.RequestAsync<RespondRequestAllVirtualObjects>(_msgRequestAll);
 
-            // and then test if the right thing is in the dictionary
-            Dictionary<int, CodeObject> expectedRespDict = new Dictionary<int, CodeObject>();
-            expectedRespDict.Add(1, initialDict[1]);
+            // test if the right thing is in the dictionary
+            Dictionary<int, CodeObject> expectedRespDict = new Dictionary<int, CodeObject>
+            {
+                { 1, initialDict[1] }
+            };
             CollectionAssert.AreEqual(expectedRespDict, responseToRequestAll.newCodeObjectIDToCodeObject);
 
             // test if we wanna set Active a CodeObject which does not exist, then a failed to message should come back
@@ -87,8 +100,11 @@ namespace TourBackend
 
         /// <summary>
         /// The idea here is that we send a message to the Recognition Manager to SetInActive a specific 
-        /// VirtualObject. The Recognition Manager should response with the messageID of the SetInActive Command
-        /// and the VirtualObjectID of the now inactive VirtualObject
+        /// VirtualObject meaning the virtual representation of an aruco code marker. The Recognition 
+        /// Manager should response with the messageID of the SetActive Command and the VirtualObjectID 
+        /// of the now active VirtualObject. if the VirtualObject of interest does not exist in the
+        /// internal dictionary of the recognition manager, the control actor should receive a failed to
+        /// do this taks message.
         /// </summary>
         [TestMethod]
         public async Task Control_Asks_RecognitionManager_To_SetInActiveVirtualObject()
@@ -96,32 +112,35 @@ namespace TourBackend
             // create the testrecognition manager and the dictionary with all the initialized markers in it. 
             // But all have isActive = false...
             Dictionary<int, CodeObject> initialDict = Utils.HelpForTesting.CreateDictionaryForInitialization(10);
+            // need some active CodeObjects to test it properly
             initialDict[1].isActive = true;
             initialDict[5].isActive = true;
             initialDict[7].isActive = true;
             var _propsTestRecognitionManager = Actor.FromProducer(() => new RecognitionManager("RecognitionManager", initialDict));
             var _pidTestRecognitionManager = Actor.Spawn(_propsTestRecognitionManager);
 
-            // now send the message that codeObject 1 should be set inActive
+            // send the message that codeObject 1 should be set inActive
             var _msgSetInActiveCO1 = new SetInActiveVirtualObject("SetInActiveCO1", 1);
             var responseToSetInActive = await _pidTestRecognitionManager.RequestAsync<RespondSetInActiveVirtualObject>(_msgSetInActiveCO1, TimeSpan.FromSeconds(1));
 
-            // now we should get the right messageID and the right CodeObject ID back
+            // we should get the right messageID and the right CodeObject ID back
             Assert.AreEqual("SetInActiveCO1", responseToSetInActive.messageID);
             Assert.AreEqual(1, responseToSetInActive.nowInActiveVirtualObjectID);
 
-            // and then test if the data is at the current state in the dictionary
+            // test if the dictionary is also up to date
             // first make an request all call to the recognitionManager to get the whole Dictionary back
             var _msgRequestAll = new RequestAllVirtualObjects("RequestAll", TimeSpan.FromSeconds(1));
             var responseToRequestAll = await _pidTestRecognitionManager.RequestAsync<RespondRequestAllVirtualObjects>(_msgRequestAll);
 
-            // and then test if the right thing is in the dictionary, meaning that the isActive of the 
+            // test if the right thing is in the dictionary, meaning that the isActive of the 
             // codeObject1 has changed from true to false and that is if the CodeObject is no longer in that respondDictionary
             Assert.AreEqual("RequestAll", responseToRequestAll.messageID);
             // the respondDict should have two CodeObjects with ID 5 and 7 in it
-            Dictionary<int, CodeObject> expectedRespDict = new Dictionary<int, CodeObject>();
-            expectedRespDict.Add(5, initialDict[5]);
-            expectedRespDict.Add(7, initialDict[7]);
+            Dictionary<int, CodeObject> expectedRespDict = new Dictionary<int, CodeObject>
+            {
+                { 5, initialDict[5] },
+                { 7, initialDict[7] }
+            };
             CollectionAssert.AreEqual(expectedRespDict, responseToRequestAll.newCodeObjectIDToCodeObject);
 
             // test if we wanna set InActive a CodeObject which does not exist, then a failed to message should come back
@@ -129,6 +148,7 @@ namespace TourBackend
             var responseToSetInActive100 = await _pidTestRecognitionManager.RequestAsync<FailedToSetInActiveVirtualObject>(_msgSetInActiveCO100, TimeSpan.FromSeconds(1));
             Assert.AreEqual("SetInActiveCO100", responseToSetInActive100.messageID);
         }
+
         /// <summary>
         /// here the idea is that if the controlActor gets a message from the cameraFeedActor that a new 
         /// frame arrived, he should forward this message to the recognitionManager. The communication between
@@ -138,31 +158,30 @@ namespace TourBackend
         /// THIS TEST ONLY TESTS THE RESPOND MESSAGE IS CORRECTLY BUT NOT THAT THE EVALUATION OF THE FRAME WAS RIGHT!!!
         /// </summary>
         [TestMethod]
-        public async Task Control_forwards_message_NewFrameArrived_to_the_recognitionManager()
+        public async Task recognitionManager_responds_correctly_to_the_message_new_frame_arrived()
         {
-            // then create the testrecognition manager and the dictionary with all the initialized markers in it. 
+            // create the testrecognition manager and the dictionary with all the initialized markers in it. 
             // But all have isActive = false...
             Dictionary<int, CodeObject> initialDict = Utils.HelpForTesting.CreateDictionaryForInitialization(10);
             var _propsTestRecognitionManager = Actor.FromProducer(() => new RecognitionManager("RecognitionManager", initialDict));
             var _pidTestRecognitionManager = Actor.Spawn(_propsTestRecognitionManager);
-
-            // create a new object of the message type NewFrameArrived. for this we need firstly a new messageID
-            string _messageID = "NewFrameArrived1";
-            // and secondly a SoftwareBitmap and to get a testbitmap we need to follow these steps...they are
-            // copied from the CameraFeedActor_UnitTest.cs and where there defined
-            // Creates a testframe with the right Type
+            
+            // create a SoftwareBitmap from a local folder and to get a testbitmap we need to follow these steps...they are
+            // copied from the CameraFeedActor_UnitTest.cs Line 77
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path = Path.Combine(path, "Resources");
             path = Path.Combine(path, "ArucoCode_ID_1.bmp");
             Stream testfile = File.OpenRead(path);
             var _testbitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(testfile);
 
+            // create a new object of the message type NewFrameArrived.
+            string _messageID = "NewFrameArrived1";
             var msg = new NewFrameArrived(_messageID, _testbitmap);
 
-            // now send this message to the recognitionManager and get the answer in the response variable
+            // send this message to the recognitionManager
             var response = await _pidTestRecognitionManager.RequestAsync<RespondNewFrameArrived>(msg, TimeSpan.FromSeconds(10));
 
-            // now check if we get the right answer meaning the right message id
+            // check if we get the right answer meaning the right message id
             Assert.AreEqual(response.messageID, _messageID);
         }
 
@@ -170,14 +189,15 @@ namespace TourBackend
         /// the idea here is that if the controlActor sends the message NewFrameArrived to the RecognitionManager (=RM), then 
         /// the RM makes the evaluation of the frames and After the that he should update his values in the
         /// dictionary CodeObjectIDToCodeObject. Finally the RM should respond to the controlActor with the corresponding 
-        /// defined message: RespondNewFrameArrived to signalise that all works perfectly fine.
+        /// defined message: RespondNewFrameArrived to signalise that all worked perfectly fine.
         /// </summary>
         [TestMethod]
         public async Task RecognitionManager_evaluates_one_frame_with_no_marker_correctly()
         {
-            // then create the testrecognition manager and the dictionary with all the initialized markers in it. 
+            // create the testrecognition manager and the dictionary with all the initialized markers in it. 
             // But all have isActive = false...
             Dictionary<int, CodeObject> initialDict = Utils.HelpForTesting.CreateDictionaryForInitialization(10);
+            // need some active elements to test properly
             initialDict[1].isActive = true;
             initialDict[5].isActive = true;
             initialDict[7].isActive = true;
@@ -185,23 +205,23 @@ namespace TourBackend
             var _pidTestRecognitionManager = Actor.Spawn(_propsTestRecognitionManager);
 
             // create a new object of the message type NewFrameArrived
-            string _messageID = "NewFrameArrived";
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path = Path.Combine(path, "Resources");
             path = Path.Combine(path, "ArucoCode_No_Marker.bmp");
             Stream testfile = File.OpenRead(path);
             var _testbitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(testfile);
 
-            // now we are able to create the message
+            string _messageID = "NewFrameArrived";
+
             var msg = new NewFrameArrived(_messageID, _testbitmap);
 
-            // now send this message to the recognitionManager and get the answer in the response variable
+            // send this message to the recognitionManager
             var respondNewFrameArrived = await _pidTestRecognitionManager.RequestAsync<RespondNewFrameArrived>(msg, TimeSpan.FromSeconds(10));
 
-            // now check if we get the right answer meaning the right message id
+            // check if we get the right answer meaning the right message id
             Assert.AreEqual(respondNewFrameArrived.messageID, _messageID);
 
-            // now check with the request all if the right changes were made in the dictionary
+            // check with the request all if the right changes were made in the dictionary
             var requestAll = new RequestAllVirtualObjects("Request", TimeSpan.FromSeconds(1));
             var respondRequestAll = await _pidTestRecognitionManager.RequestAsync<RespondRequestAllVirtualObjects>(requestAll, TimeSpan.FromSeconds(1));
             Assert.AreEqual("Request", respondRequestAll.messageID);
@@ -217,27 +237,27 @@ namespace TourBackend
         [TestMethod]
         public async Task RecognitionManager_evaluates_one_frame_with_one_marker_correctly()
         {
-            // then create the testrecognition manager and the dictionary with all the initialized markers in it. 
+            // create the testrecognition manager and the dictionary with all the initialized markers in it. 
             // But all have isActive = false...
             Dictionary<int, CodeObject> initialDict = Utils.HelpForTesting.CreateDictionaryForInitialization(10);
             var _propsTestRecognitionManager = Actor.FromProducer(() => new RecognitionManager("RecognitionManager", initialDict));
             var _pidTestRecognitionManager = Actor.Spawn(_propsTestRecognitionManager);
 
             // create a new object of the message type NewFrameArrived
-            string _messageID = "NewFrameArrived";
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path = Path.Combine(path, "Resources");
             path = Path.Combine(path, "ArucoCode_ID_1.bmp");
             Stream testfile = File.OpenRead(path);
             var _testbitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(testfile);
 
-            // now we are able to create the message
+            string _messageID = "NewFrameArrived";
+
             var msg = new NewFrameArrived(_messageID, _testbitmap);
 
-            // now send this message to the recognitionManager and get the answer in the response variable
+            // send this message to the recognitionManager
             var respondNewFrameArrived = await _pidTestRecognitionManager.RequestAsync<RespondNewFrameArrived>(msg, TimeSpan.FromSeconds(10));
 
-            // now check if we get the right answer meaning the right message id
+            // check if we get the right answer meaning the right message id
             Assert.AreEqual(respondNewFrameArrived.messageID, _messageID);
 
             // check with the request all if the right objects are in the dictionary
@@ -271,30 +291,30 @@ namespace TourBackend
         [TestMethod]
         public async Task RecognitionManager_evaluates_one_frame_with_two_markers_correctly()
         {
-            // then create the testrecognition manager and the dictionary with all the initialized markers in it. 
+            // create the testrecognition manager and the dictionary with all the initialized markers in it. 
             // But all have isActive = false...
             Dictionary<int, CodeObject> initialDict = Utils.HelpForTesting.CreateDictionaryForInitialization(10);
             var _propsTestRecognitionManager = Actor.FromProducer(() => new RecognitionManager("RecognitionManager", initialDict));
             var _pidTestRecognitionManager = Actor.Spawn(_propsTestRecognitionManager);
 
             // create a new object of the message type NewFrameArrived
-            string _messageID = "NewFrameArrived";
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path = Path.Combine(path, "Resources");
             path = Path.Combine(path, "ArucoCode_ID_1_8.bmp");
             Stream testfile = File.OpenRead(path);
             var _testbitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(testfile);
 
-            // now we are able to create the message
+            string _messageID = "NewFrameArrived";
+
             var msg = new NewFrameArrived(_messageID, _testbitmap);
 
-            // now send this message to the recognitionManager and get the answer in the response variable
+            // send this message to the recognitionManager
             var respondNewFrameArrived = await _pidTestRecognitionManager.RequestAsync<RespondNewFrameArrived>(msg, TimeSpan.FromSeconds(10));
 
-            // now check if we get the right answer meaning the right message id
+            // check if we get the right answer meaning the right message id
             Assert.AreEqual(respondNewFrameArrived.messageID, _messageID);
 
-            // now check with the request all if the right changes were made in the dictionary
+            // check with the request all if the right changes were made in the dictionary
             var requestAll = new RequestAllVirtualObjects("Request", TimeSpan.FromSeconds(1));
             var respondRequestAll = await _pidTestRecognitionManager.RequestAsync<RespondRequestAllVirtualObjects>(requestAll, TimeSpan.FromSeconds(1));
             Assert.AreEqual("Request", respondRequestAll.messageID);
@@ -335,34 +355,38 @@ namespace TourBackend
         [TestMethod]
         public async Task RecognitionManager_evaluates_one_frame_with_multiple_markers_correctly()
         {
-            // then create the testrecognition manager and the dictionary with all the initialized markers in it. 
+            // create the testrecognition manager and the dictionary with all the initialized markers in it. 
             // But all have isActive = false...
             Dictionary<int, CodeObject> initialDict = Utils.HelpForTesting.CreateDictionaryForInitialization(10);
             var _propsTestRecognitionManager = Actor.FromProducer(() => new RecognitionManager("RecognitionManager", initialDict));
             var _pidTestRecognitionManager = Actor.Spawn(_propsTestRecognitionManager);
 
             // create a new object of the message type NewFrameArrived
-            string _messageID = "NewFrameArrived";
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path = Path.Combine(path, "Resources");
             path = Path.Combine(path, "ArucoCode_ID_1_2_3_7_10.bmp");
             Stream testfile = File.OpenRead(path);
             var _testbitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(testfile);
 
-            // now we are able to create the message
+            string _messageID = "NewFrameArrived";
+
             var msg = new NewFrameArrived(_messageID, _testbitmap);
 
-            // now send this message to the recognitionManager and get the answer in the response variable
+            // send this message to the recognitionManager 
             var respondNewFrameArrived = await _pidTestRecognitionManager.RequestAsync<RespondNewFrameArrived>(msg, TimeSpan.FromSeconds(10));
 
-            // now check if we get the right answer meaning the right message id
+            // check if we get the right answer meaning the right message id
             Assert.AreEqual(respondNewFrameArrived.messageID, _messageID);
 
             // now check with the request all if the right changes were made in the dictionary
             var requestAll = new RequestAllVirtualObjects("Request", TimeSpan.FromSeconds(1));
             var respondRequestAll = await _pidTestRecognitionManager.RequestAsync<RespondRequestAllVirtualObjects>(requestAll, TimeSpan.FromSeconds(1));
+
+            // check the message ID and the size of the dictionary
             Assert.AreEqual("Request", respondRequestAll.messageID);
             Assert.AreEqual(5, respondRequestAll.newCodeObjectIDToCodeObject.Count);
+
+            // check if the ID's are the ones we expect
             Assert.AreEqual(true, respondRequestAll.newCodeObjectIDToCodeObject.ContainsKey(1));
             Assert.AreEqual(true, respondRequestAll.newCodeObjectIDToCodeObject.ContainsKey(2));
             Assert.AreEqual(true, respondRequestAll.newCodeObjectIDToCodeObject.ContainsKey(3));

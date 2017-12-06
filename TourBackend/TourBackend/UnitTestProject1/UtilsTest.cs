@@ -71,7 +71,6 @@ namespace TourBackend
                     Assert.AreEqual(ret.Data[a, i, 2], 107);
                 }
             }
-            
         }
     }
     [TestClass]
@@ -298,18 +297,16 @@ namespace TourBackend
         }
     }
 
-
     [TestClass]
     public class HelpForTesting
     {
-
         /// <summary>
-        /// the idea here is just to create an dictionary with codeObjects to make it easier and more
-        /// readable to test. Cause in every test you have to create the recognition Manager and therefore
-        /// you have to make a dictionary
+        /// the idea here is to create an dictionary with codeObjects to make it easier and more
+        /// readable to test. Cause in every unit test of the recognition manager you have to create 
+        /// the recognition Manager and therefore you have to give a dictionary as a constructor argument
         /// </summary>
         [TestMethod]
-        public void Create_New_Dictionary_successfully()
+        public void CreateDictionaryForInitialization_must_work_as_expected()
         {
             // check if an empty dictionary gets created correctly
             Dictionary<int,CodeObject> empty = Utils.HelpForTesting.CreateDictionaryForInitialization(0);
@@ -336,13 +333,17 @@ namespace TourBackend
             }
         }
 
+        /// <summary>
+        /// the idea here is that we can easily test updated codeObject position arrays with this function
+        /// for any given bitmap file. This makes the code more readable in the recognition manager unit tests
+        /// </summary>
         [TestMethod]
-        public void Saving_Translations_of_Bitmap_File_works_Correctly()
+        public void GetTranslationsOfBitmapFile_must_works_as_expected()
         {
             double [,] testArray = Utils.HelpForTesting.GetTranslationsOfBitmapFile("ArucoCode_ID_1_8.bmp");
             double e = 0.0000000001d; // is the error we accept for the comparison of two double numbers
 
-            // the values are from the test "TestEmguCVEstimatePoseSingleMarker" with the corresponding file
+            // the values are from the output of the test "TestEmguCVEstimatePoseSingleMarker" with the corresponding file 'ArucoCode_ID_1_8.bmp'
             Assert.AreEqual(true, System.Math.Abs(testArray[0, 0] - 0.0737796277430287d) < e);
             Assert.AreEqual(true, System.Math.Abs(testArray[0, 1] - 0.227391492179383d) < e);
             Assert.AreEqual(true, System.Math.Abs(testArray[0, 2] - 0.468146142991522d) < e);
@@ -351,8 +352,12 @@ namespace TourBackend
             Assert.AreEqual(true, System.Math.Abs(testArray[1, 2] - 0.289776788475129d) < e);
         }
 
+        /// <summary>
+        /// the idea here is that we can easily test updated codeObject rotation arrays with this function
+        /// for any given bitmap file. This makes the code more readable in the recognition manager unit tests
+        /// </summary>
         [TestMethod]
-        public void Saving_RotationMatrices_of_Bitmap_File_works_Correctly()
+        public void GetRotationMatricesOfBitmapFile_must_work_as_expected()
         {
             double[,] testArray = Utils.HelpForTesting.GetRotationMatricesOfBitmapFile("ArucoCode_ID_1_8.bmp");
             double e = 0.0000000001d; // is the error we accept for the comparison of two double numbers
@@ -378,25 +383,24 @@ namespace TourBackend
             Assert.AreEqual(true, System.Math.Abs(testArray[1, 8] + 0.952251511238241d) < e);
         }
 
-
-
         /// <summary>
-        /// this test is here to try the functions from emguCV out and see what types are the arguments
-        /// and so on. Just to get a better feeling of what exactly the functions take and return
+        /// this test is here to try out the functions from emguCV and see what types the arguments take
+        /// and so on. Further we can see the rotation and translation data of a chosen bitmap file in the 
+        /// console output. This test is Just to get a better feeling of what exactly the functions make, 
+        /// what they need and what they produce. Only For Understanding purpose.
         /// </summary>
         [TestMethod]
-        public void TestEmguCVEstimatePoseSingleMarker()
+        public void TestEmguCV_DetectMarkers_and_EstimatePoseSingleMarkers()
         {
-            // first get an bitmap
+            // first get an bitmap of a chosen file
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path = Path.Combine(path, "Resources");
+            // here choose the file
             path = Path.Combine(path, "ArucoCode_ID_1_2_3_7_10.bmp");
             Stream testfile = File.OpenRead(path);
             var _testbitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(testfile);
 
-            // then define the arguments for the emguCV functions
-
-            // first set all arguments for the DetectMarkers function call
+            // set all arguments for the DetectMarkers function call
             Emgu.CV.Image<Bgr, Byte> _image = Utils.BitmapToImage.CreateImagefromBitmap(_testbitmap);
             var MarkerTypeToFind = new Dictionary(Dictionary.PredefinedDictionaryName.DictArucoOriginal);
             var outCorners = new VectorOfVectorOfPointF();
@@ -406,10 +410,19 @@ namespace TourBackend
             // now detect the markers in the image bitmap
             Emgu.CV.Aruco.ArucoInvoke.DetectMarkers(_image, MarkerTypeToFind, outCorners, outIDs, _detectorParameters, null);
 
-            // then define all arguments for the estimatePoseSingleMarkers function call
-            float markerLength = 0.1f; // set the default markerLength which is usually given in the unit meter
+            // give the corresponding outIDS to the console
+            for (int i = 0; i < outIDs.Size; ++i)
+            {
+                Console.WriteLine("The " + i + " - th element in the ID Array is:    " + outIDs[i]);
+            }
+
+            Console.WriteLine("");
+
+            // set all arguments for the estimatePoseSingleMarkers function call
+            float markerLength = 0.1f; // set the default markerLength which is usually given in the unit meter, here randomly chosen
             Mat cameraMatrix = new Mat();
             cameraMatrix.Create(3, 3, Emgu.CV.CvEnum.DepthType.Cv32F, 1);
+            // the cameraMatrix and distortion coefficients are the one for the hololens. the data is from: https://github.com/qian256/HoloLensCamCalib/blob/master/near/hololens896x504.yaml
             cameraMatrix.SetTo(new[] { 1039.7024546115156f, 0.0f, 401.9889542361556f, 0.0f, 1038.5598693279526f, 179.02511993572065f, 0.0f, 0.0f, 11.0f });
             Mat distcoeffs = new Mat();
             distcoeffs.Create(1, 5, Emgu.CV.CvEnum.DepthType.Cv32F, 1);
@@ -417,13 +430,11 @@ namespace TourBackend
             Mat rvecs = new Mat();
             Mat tvecs = new Mat();
 
-            // now get all the pose in tvecs and all rotations in rvecs
+            // now get all the position vectors in tvecs and all rotation vectors in rvecs
             Emgu.CV.Aruco.ArucoInvoke.EstimatePoseSingleMarkers(outCorners, markerLength, cameraMatrix, distcoeffs, rvecs, tvecs);
 
-            // here we extract the translation vector out of the tvecs mat return value
-            // which stored the values as doubles in the mat
-            // Moritz: darauf achten, dass die Dimensionen stimmen! 
-            // Generell können in rvecs/tvecs beliebig viele Einträge stehen.
+            // here we extract the translation vector out of the tvecs mat
+            // which stored the values as doubles in the mat.
             int idSize = outIDs.Size;
             int tvecsRows = tvecs.Rows;
             if (idSize == tvecsRows)
@@ -432,14 +443,18 @@ namespace TourBackend
                 {
                         double[] _tvecs = new double[3];
                         tvecs.Row(p).CopyTo<double>(_tvecs);
+                        char ascii = 'x';
                         for (int i = 0; i < _tvecs.Length; ++i)
                         {
-                            Console.WriteLine("tvecs " + p + "= " + _tvecs[i]);
+                            Console.WriteLine("Translation Vector " + (char)(ascii + i) + "-component of Marker with ID " + outIDs[p] + "= " + _tvecs[i]);
                         }
+
+                    Console.WriteLine("");
+
                 }
             }
-                
-            // here we extract the roation vector out of the rvecs mat return value
+
+            // here we extract the roation vectors out of the rvecs mat
             // which stored the values as doubles in the mat
             int rvecsRows = rvecs.Rows;
             if (idSize == rvecsRows)
@@ -449,17 +464,24 @@ namespace TourBackend
                     // first give out the rotation vector
                     double[] _rvecs = new double[3];
                     rvecs.Row(r).CopyTo<double>(_rvecs);
+                    char ascii = 'x';
                     for (int i = 0; i < _rvecs.Length; ++i)
                     {
-                        Console.WriteLine("rvecs " + r + "= " + _rvecs[i]);
+                        Console.WriteLine("Rotation Vector " + (char)(ascii + i) + "-component of Marker with ID " + outIDs[r] + "= " + _rvecs[i]);
                     }
 
+                    Console.WriteLine("");
+                }
+
+                for (int r = 0; r < rvecsRows; ++r)
+                { 
                     // then create the outputmatrix
                     // here we create a rotation matrix out of the rotation vector, it is this a 3x3 matrix with
-                    // 9 elements and it is like: rotMat(x,y) = _rotmat(x+y-2)
+                    // 9 elements and it is like: rotMat(x,y) = _rotmat(x+y-2) if x,y >= 0
                     // which stored the values as doubles in the mat
                     double[] _rotMat = new double[9];
                     Mat rotMat = new Mat();
+                    // here we transform the rotation vector Mat into a rotation matrix Mat
                     Emgu.CV.CvInvoke.Rodrigues(rvecs.Row(r), rotMat, null);
                     rotMat.CopyTo<double>(_rotMat);
                     for (int i = 0; i < _rotMat.Length; ++i)
@@ -467,15 +489,11 @@ namespace TourBackend
                         double help = i / 3;
                         int index_x = (int)Math.Floor(help);
                         int index_y = i % 3;
-                        Console.WriteLine("rotMat" + r + "(" + index_x + ", " + index_y + ") = " + _rotMat[i]);
+                        Console.WriteLine("Rotation Matrix Element (" + index_x + ", " + index_y + ") of Marker with ID " + outIDs[r] + " = " + _rotMat[i]);
                     }
-                }
-            }
 
-            // give the corresponding outIDS to the console
-            for(int i = 0; i < outIDs.Size; ++i)
-            {
-                Console.WriteLine("The " + i + " - th element in the ID Array is:    " + outIDs[i]);
+                    Console.WriteLine("");
+                }
             }
         }
     }
