@@ -70,7 +70,7 @@ namespace TourBackend
             var propsctrl = Actor.FromProducer(() => new ControlActor("ctrl", syncobj, null, new Dictionary<int, CodeObject>()));
             var pidctrl = Actor.Spawn(propsctrl);
 
-            // Statt der PID des ControlActor wird die des TestActors gegeben um die gesendete Nachricht abzufangen
+            // instead of the PID of the control actor the PID of the test actor is given to receive the sent message
             var propsSyncActor1 = Actor.FromProducer(() => new CameraFeedActor("CameraFeedActor", syncobj2, pidtest));
             var pidSyncActor1 = Actor.Spawn(propsSyncActor1);
 
@@ -95,6 +95,5 @@ namespace TourBackend
                 Assert.AreEqual(((NewFrameArrived)msg).id, "110100010");
             }
         }
-
     }
 }

@@ -143,7 +143,8 @@ namespace TourBackend
     /* Now we define all the responds to the upper commands/requests from the control actor to the recognition manager */
 
     /// <summary>
-    /// with this message type we are able to respond to the command SetActiveVirtualObject
+    /// with this message type we are able to respond to the command SetActiveVirtualObject to say the work
+    /// was successfully done
     /// </summary>
     public class RespondSetActiveVirtualObject
     {
@@ -158,7 +159,8 @@ namespace TourBackend
     }
 
     /// <summary>
-    /// with this message type we are able to respond to the command SetInActiveVirtualObject
+    /// with this message type we are able to respond to the command SetInActiveVirtualObject to say the work
+    /// was successfully done
     /// </summary>
     public class RespondSetInActiveVirtualObject
     {
@@ -173,7 +175,8 @@ namespace TourBackend
     }
 
     /// <summary>
-    /// with this message type we are able to respond to the command RequestAllVirtualObjects
+    /// with this message type we are able to respond to the command RequestAllVirtualObjects in the sense that
+    /// the work was successfully done
     /// </summary>
     public class RespondRequestAllVirtualObjects
     {
@@ -193,7 +196,8 @@ namespace TourBackend
     /* the following three message responds to the commands are features that are not used for the nano-case ! */
 
     /// <summary>
-    /// with this message type we are able to respond to the command StartVirtualObject
+    /// with this message type we are able to respond to the command StartVirtualObject to say the work
+    /// was successfully done
     /// </summary>
     public class RespondStartVirtualObject
     {
@@ -208,7 +212,8 @@ namespace TourBackend
     }
 
     /// <summary>
-    /// with this message type we are able to respond to the command StopVirtualObject
+    /// with this message type we are able to respond to the command StopVirtualObject to say the work
+    /// was successfully done
     /// </summary>
     public class RespondStopVirtualObject
     {
@@ -223,7 +228,8 @@ namespace TourBackend
     }
 
     /// <summary>
-    /// with this message type we are able to respond to the command CreateNewVirtualObject
+    /// with this message type we are able to respond to the command CreateNewVirtualObject to say the work
+    /// was successfully done
     /// </summary>
     public class RespondCreateNewVirtualObject
     { 
@@ -238,7 +244,8 @@ namespace TourBackend
     }
 
     /// <summary>
-    /// with this message type we are able to respond to the command KillVirtualObject
+    /// with this message type we are able to respond to the command KillVirtualObject to say the work
+    /// was successfully done
     /// </summary>
     public class RespondKillVirtualObject
     {
