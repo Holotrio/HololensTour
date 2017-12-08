@@ -1,24 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using FluentAssertions;
+using System.IO;
+using System.Reflection;
+using System.Drawing;
+using Emgu.CV.Util;
+using Emgu.CV.Aruco;
+using Emgu.CV.Structure;
+using Emgu.CV;
+using System.Diagnostics;
+using Emgu.CV.CvEnum;
+using System.Runtime.InteropServices;
 
 namespace TourBackend
 {
+
     [TestClass]
     public class TestingTemplate
     {
-        [TestMethod]
-        public void Feature_that_has_to_be_tested()
-        {
-            /*
-                        var props = Actor.FromProducer(() => new TestActor("testactor1"));
-                        var pid = Actor.Spawn(props);
-
-                        var reply = await pid.RequestAsync<TestMsg>(new TestMsg("test1", "Hello!"), TimeSpan.FromSeconds(1));
-
-                        Assert.AreEqual(reply.Id, "test1");
-              */
-        }
     }
 }
