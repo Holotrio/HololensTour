@@ -132,16 +132,16 @@ namespace TourBackend
         {
             // first set all arguments for the DetectMarkers method call
             Emgu.CV.Image<Bgr, Byte> _image = Utils.BitmapToImage.CreateImagefromBitmap(_bitmap);
-            var MarkerTypeToFind = new Dictionary(Dictionary.PredefinedDictionaryName.DictArucoOriginal);
+            var MarkerTypeToFind = new Dictionary(Dictionary.PredefinedDictionaryName.DictArucoOriginal); // here we specify the type of marker we are searching for in the image
             var outCorners = new VectorOfVectorOfPointF();
-            var outIDs = new VectorOfInt();
+            var outIDs = new VectorOfInt(); // since the outID has in each element the ID of a recognised Aruco Code Marker which has to be an integer
             DetectorParameters _detectorParameters = DetectorParameters.GetDefault();
 
             // now detect the markers in the image bitmap and for further information look up the EmguCv documentation
             Emgu.CV.Aruco.ArucoInvoke.DetectMarkers(_image, MarkerTypeToFind, outCorners, outIDs, _detectorParameters, null);
             
             // then define all arguments for the estimatePoseSingleMarkers method call
-            float markerLength = 0.1f; // set the default markerLength which is usually given in the unit meters
+            float markerLength = 0.1f; // set the default markerLength which is usually given in the unit meters and it has to be a float number
             // the cameraMatrix and distortion coefficients are the one for the hololens. the data is from: https://github.com/qian256/HoloLensCamCalib/blob/master/near/hololens896x504.yaml
             Mat cameraMatrix = new Mat();
             cameraMatrix.Create(3, 3, Emgu.CV.CvEnum.DepthType.Cv32F, 1);
@@ -169,12 +169,12 @@ namespace TourBackend
         /// has all the ID's of the recognised ArucoCodeMarkers in the frame unordered in it. the type of the ID's are only integers
         /// </param>
         /// <param name="_translationVectors">
-        /// has all translationVectors of the recognised ArucoCodeMarkers in the frame in it. For each marker there are 3 double values
+        /// has all translationVectors of the recognised ArucoCodeMarkers in the frame in it. For each marker there are 3 double !!! values
         /// which describe the translation along the axis x,y and z stored like [i,0] = x , [i,1] = y and [i,2] = z. The order which marker is 
         /// in which row is exactly according to the order of the _ids vectorOfInt.
         /// </param>
         /// <param name="_rotationVectors">
-        /// has all rotationVectors of the recognised ArucoCodeMarkers in the frame in it. For each marker there are 3 double values
+        /// has all rotationVectors of the recognised ArucoCodeMarkers in the frame in it. For each marker there are 3 double !!! values
         /// which describe the rotation. they form a vector. its direction describes the rotation axis and its length defines the rotation 
         /// in radian degree. The order which marker is in which row is exactly according to the order of the _ids vectorOfInt.
         /// </param>
