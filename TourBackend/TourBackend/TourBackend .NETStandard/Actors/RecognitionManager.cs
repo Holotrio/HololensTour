@@ -62,6 +62,7 @@ namespace TourBackend
 
                         // if we now have the return Dictionary, send the Respond message back to the sender
                         context.Sender.Tell(new RespondRequestAllVirtualObjects(r.messageID, returnDict));
+                        Console.WriteLine("Recognition Manager says: The work of the RequestAll with ID = '" + r.messageID + "' is done.");
                     
                     break;
 
@@ -76,11 +77,13 @@ namespace TourBackend
                             codeObjectIDToCodeObject[s.toBeActiveVirtualObjectID].isActive = true;
                             // respond to the sender
                             context.Sender.Tell(new RespondSetActiveVirtualObject(s.messageID, s.toBeActiveVirtualObjectID));
+                            Console.WriteLine("Recognition Manager says: The CodeObject with ID = '" + s.toBeActiveVirtualObjectID + "' is now active");
                         }
                         else
                         {
                             // respond to the sender with a failedToMessage
                             context.Sender.Tell(new FailedToSetActiveVirtualObject(s.messageID));
+                            Console.WriteLine("Recognition Manager says: The CodeObject with ID = '" + s.toBeActiveVirtualObjectID + "' which should have been activated, does not exist in the internal dictionary");
                         }
                     
                     break;
@@ -96,24 +99,28 @@ namespace TourBackend
                             codeObjectIDToCodeObject[s.toBeInActiveVirtualObjectID].isActive = false;
                             // respond to the sender
                             context.Sender.Tell(new RespondSetInActiveVirtualObject(s.messageID, s.toBeInActiveVirtualObjectID));
-                        }
-                        else
+                            Console.WriteLine("Recognition Manager says: The CodeObject with ID = '" + s.toBeInActiveVirtualObjectID + "' is now inactive");
+                    }
+                    else
                         {
                             // respond to the sender with a failedToMessage
                             context.Sender.Tell(new FailedToSetInActiveVirtualObject(s.messageID));
-                        }
-                    
+                            Console.WriteLine("Recognition Manager says: The CodeObject with ID = '" + s.toBeInActiveVirtualObjectID + "' which should have been inactivated, does not exist in the internal dictionary");
+
+                    }
+
                     break;
 
                 // the idea here is if the recognition manager gets this message, he takes the frame, evaluate it and
                 // then update the internal dictionary. having done this he should reply to the controlActor that all went well
                 case NewFrameArrived n:
-                    
+
+                        Console.WriteLine("Recognition Manager says: The work with the frame with ID = '" + n.id + "' started");
                         // do the work here with the recognition of the frame
                         FrameEvaluation(n.bitmap);
-
                         // after the successfull evaluation respond to the control Actor
                         context.Sender.Tell(new RespondNewFrameArrived(n.id));
+                        Console.WriteLine("Recognition Manager says: The work with the frame with ID = '" + n.id + "' is done");
                     
                     break;
             }
@@ -155,9 +162,13 @@ namespace TourBackend
             // now get all the pose in form of a translation vector in tvecs and all rotations in form of a rotation vector in rvecs
             // and for further information look up the EmguCv documentation or the description of the method "UpdateInternalDictionary"
             Emgu.CV.Aruco.ArucoInvoke.EstimatePoseSingleMarkers(outCorners, markerLength, cameraMatrix, distcoeffs, rvecs, tvecs);
-            
+
+            Console.WriteLine("Recognition Manager says: The Positions and Rotations are extracted out of the frame.");
+
             // now update the internal dictionary with the new data
-            UpdateInternalDictionary(outIDs, tvecs, rvecs);            
+            UpdateInternalDictionary(outIDs, tvecs, rvecs);
+
+            Console.WriteLine("Recognition Manager says: The internal dictionary is updated according to the frame.");
         }
 
         /// <summary>

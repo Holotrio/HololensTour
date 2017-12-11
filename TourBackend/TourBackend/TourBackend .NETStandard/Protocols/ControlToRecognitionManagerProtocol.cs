@@ -8,16 +8,18 @@ using Proto;
 namespace TourBackend
 {
     /* 
-     * The idea here is to define messageTypes for the communication between the actors.
+     * The idea here is to define messageTypes for the communication between the two actors: 
+     * (i) Control Actor (ii) Recognition Manager 
      * To identify the specific message instance we also need a variable _messageID = _id (this is useful for debugging)
-     * and to have the control of the outgoing and incoming messages...
+     * and to have the control of the outgoing and incoming messages in the Control Actor.
     */
 
-    /* Now we first define all the commands from the ControlActor to the RecognitionManager */
+    /* Now we first define all the commands/requests from the ControlActor to the RecognitionManager */
 
     /// <summary>
-    /// with this message we want to be able to set an VirtualObject active meaning that it his internal state
-    /// isActive is changed to true whatever it was before
+    /// with this message type we are able to set a specific VirtualObject active meaning that it his internal state
+    /// isActive is changed to true whatever value that boolean had before. If the VirtualObject in question is not
+    /// listed in the internal dictionary of the Recognition Manager we get a failed to do this task respond.
     /// </summary>
     public class SetActiveVirtualObject
     {
@@ -32,8 +34,9 @@ namespace TourBackend
     }
 
     /// <summary>
-    /// with this message we want to be able to set an VirtualObject inactive meaning that it his internal state
-    /// isActive is changed to false whatever it was before
+    /// with this message type we are able to set a specific VirtualObject inactive meaning that it his internal state
+    /// isActive is changed to false whatever value that boolean had before. If the VirtualObject in question is not
+    /// listed in the internal dictionary of the Recognition Manager we get a failed to do this task respond.
     /// </summary>
     public class SetInActiveVirtualObject
     {
@@ -48,14 +51,14 @@ namespace TourBackend
     }
 
     /// <summary>
-    /// with this message we want that the controler can request all virtual objects to know which virtualObjects are 
-    /// currently in the isActive == true state
+    /// with this message type we are able to request all virtual objects with the current internal state  
+    /// isActive == true in form of a dictionary which maps the CodeObjectID's to the CodeObjects 
     /// </summary>
     public class RequestAllVirtualObjects
     {
         // here we need another variable time, meaning if it would take 
         // too long to get all the informations from all GameObjectActors
-        // we can then easily define a behavior like throwing an error or sth else
+        // we can then easily define a behavior like throwing an error
         public string messageID;
         public TimeSpan timeSpan;
 
@@ -66,10 +69,12 @@ namespace TourBackend
         }
     }
 
-    /* the following three message commands are features that are not used for the nano-case ! */
+    /* the following three message commands/requests are features that are not used for the nano-case ! */
 
     /// <summary>
-    /// this was intented to start a video on a virtual object
+    /// with this message type we are able to start an action (like playing a video) of a virtual object. If the 
+    /// VirtualObject in question is not isted in the internal dictionary of the Recognition Manager we get a 
+    /// failed to do this task respond.
     /// </summary>
     public class StartVirtualObject
     {
@@ -84,7 +89,9 @@ namespace TourBackend
     }
 
     /// <summary>
-    /// this was intented to stop a video on a virtual object
+    /// with this message type we are able to stop an action (like playing a video) of a virtual object.
+    /// If the VirtualObject in question is not listed in the internal dictionary of the Recognition 
+    /// Manager we get a failed to do this task respond.
     /// </summary>
     public class StopVirtualObject
     {
@@ -99,7 +106,27 @@ namespace TourBackend
     }
 
     /// <summary>
-    /// this was intented to be able to kill a specific virtualObject
+    /// with this message type we are able to create a virtualObject in the sense 
+    /// that we can add a specific CodeObject to the internal dictionary of the Recognition Manager
+    /// which CodeObjectID is not yet in there. If its ID already exists there, we get a failed to to this
+    /// task respond.
+    /// </summary>
+    public class CreateNewVirtualObject
+    {
+        public CodeObject codeObjectToBeCreated;
+        public string messageID;
+
+        public CreateNewVirtualObject(string _messageID, CodeObject _codeObjectToBeCreated)
+        {
+            messageID = _messageID;
+            codeObjectToBeCreated = _codeObjectToBeCreated;
+        }
+    }
+
+    /// <summary>
+    /// with this message type we are able to kill a specific virtualObject meaning to delete it in the 
+    /// internal dictionary "codeObjectIDToCodeObject" of the recognition manager. If the VirtualObject in question is not
+    /// listed in the internal dictionary of the Recognition Manager we get a failed to do this task respond.
     /// </summary>
     public class KillVirtualObject
     {
@@ -113,18 +140,16 @@ namespace TourBackend
         }
     }
 
-    /* Now we define all the responds to the upper commands */
+    /* Now we define all the responds to the upper commands/requests from the control actor to the recognition manager */
 
     /// <summary>
-    /// the idea here is that if the virtualObject is set active that the controlActor gets the respond with the 
-    /// command messageID he sent to the recognitionManager AND the respond should also have the ID from the virtualObject
-    /// which is now in the active mode.
+    /// with this message type we are able to respond to the command SetActiveVirtualObject to say the work
+    /// was successfully done
     /// </summary>
     public class RespondSetActiveVirtualObject
     {
         public string messageID;
-        public int nowActiveVirtualObjectID;
-        
+        public int nowActiveVirtualObjectID;        
 
         public RespondSetActiveVirtualObject(string _messageID, int _nowActiveVirtualObjectID)
         {
@@ -134,9 +159,8 @@ namespace TourBackend
     }
 
     /// <summary>
-    /// the idea here is that if the virtualObject is set inactive that the controlActor gets the respond with the 
-    /// command messageID he sent to the recognitionManager AND the respond should also have the ID from the virtualObject
-    /// which is now in the inactive mode.
+    /// with this message type we are able to respond to the command SetInActiveVirtualObject to say the work
+    /// was successfully done
     /// </summary>
     public class RespondSetInActiveVirtualObject
     {
@@ -151,15 +175,14 @@ namespace TourBackend
     }
 
     /// <summary>
-    /// the idea here is that we answer to the requestAllVirtualObjects with a dictionary with all active virtual objects and 
-    /// their virtualobjectID in it. Furthermore we also send the messageID of the original command, to have the full information
-    /// needed for the controlActor
+    /// with this message type we are able to respond to the command RequestAllVirtualObjects in the sense that
+    /// the work was successfully done
     /// </summary>
     public class RespondRequestAllVirtualObjects
     {
         public string messageID;
-        // we also need a dictionary to be able to give all requested CodeObjects back to the ControlActor
-        // in form of a dictionary with a key CodeObjectID and a variable CodeObject itself. BUT a codeObject should
+        // we also need a dictionary to be able to give all requested CodeObjects back to the sender
+        // in form of a dictionary with a key "CodeObjectID" and a value "CodeObject" itself. BUT a codeObject should
         // only be in this dictionary if its internal variable isActive == true, otherwise it should not be in the dictionary
         public Dictionary<int, CodeObject> newCodeObjectIDToCodeObject;
 
@@ -172,6 +195,10 @@ namespace TourBackend
 
     /* the following three message responds to the commands are features that are not used for the nano-case ! */
 
+    /// <summary>
+    /// with this message type we are able to respond to the command StartVirtualObject to say the work
+    /// was successfully done
+    /// </summary>
     public class RespondStartVirtualObject
     {
         public string messageID;
@@ -184,6 +211,10 @@ namespace TourBackend
         }
     }
 
+    /// <summary>
+    /// with this message type we are able to respond to the command StopVirtualObject to say the work
+    /// was successfully done
+    /// </summary>
     public class RespondStopVirtualObject
     {
         public string messageID;
@@ -196,6 +227,26 @@ namespace TourBackend
         }
     }
 
+    /// <summary>
+    /// with this message type we are able to respond to the command CreateNewVirtualObject to say the work
+    /// was successfully done
+    /// </summary>
+    public class RespondCreateNewVirtualObject
+    { 
+        public string messageID;
+        public int nowCreatedVirtualObjectID;
+
+        public RespondCreateNewVirtualObject(string _messageID, int _nowCreatedVirtualObjectID)
+        {
+            messageID = _messageID;
+            nowCreatedVirtualObjectID = _nowCreatedVirtualObjectID;
+        }
+    }
+
+    /// <summary>
+    /// with this message type we are able to respond to the command KillVirtualObject to say the work
+    /// was successfully done
+    /// </summary>
     public class RespondKillVirtualObject
     {
         public string messageID;
@@ -208,33 +259,32 @@ namespace TourBackend
         }
     }
 
-    /* Now we define all the fails to the upper tasks. The idea here is that we only have to respond with a fail message
+    /* Now we define all the fails to the upper tasks. The idea here is that we only have to respond with a fail message and we know then enough about the error.
      * Secondly the messageID from the command has also to be sent, cause we want to know which command could not be done. */
 
     /* First the failures for the nano case. */
 
+    /// <summary>
+    /// with this message we are able to respond to the command SetActiveVirtualObject with a failed to do this task message.
+    /// </summary>
     public class FailedToSetActiveVirtualObject
     {
         public string messageID;
+
         public FailedToSetActiveVirtualObject(string _messageID)
         {
             messageID = _messageID;
         }
     }
 
+    /// <summary>
+    /// with this message we are able to respond to the command SetInActiveVirtualObject with a failed to do this task message.
+    /// </summary>
     public class FailedToSetInActiveVirtualObject
     {
         public string messageID;
+
         public FailedToSetInActiveVirtualObject(string _messageID)
-        {
-            messageID = _messageID;
-        }
-    }
- 
-    public class FailedToRequestAllVirtualObjects
-    {
-        public string messageID;
-        public FailedToRequestAllVirtualObjects(string _messageID)
         {
             messageID = _messageID;
         }
@@ -242,72 +292,53 @@ namespace TourBackend
 
     /* Secondly the failures for the not nano case. */
 
+    /// <summary>
+    /// with this message we are able to respond to the command StartVirtualObject with a failed to do this task message.
+    /// </summary>
     public class FailedToStartVirtualObject
     {
         public string messageID;
+
         public FailedToStartVirtualObject(string _messageID)
         {
             messageID = _messageID;
         }
     }
 
+    /// <summary>
+    /// with this message we are able to respond to the command StopVirtualObject with a failed to do this task message.
+    /// </summary>
     public class FailedToStopVirtualObject
     {
         public string messageID;
+
         public FailedToStopVirtualObject(string _messageID)
         {
             messageID = _messageID;
         }
     }
 
-    public class FailedToKillVirtualObject
-    {
-        public string messageID;
-        public FailedToKillVirtualObject(string _messageID)
-        {
-            messageID = _messageID;
-        }
-    }
-    
     /// <summary>
-    /// this message Type here is only for testing... actually in a usecase the controlActor never asks the recognition manager
-    /// to create a new object, cause that he does it on his own. if the reco Manager sees a new marker then he immediately
-    /// creates a new VirtualObject from his own without calling the ControllActor 
+    /// with this message we are able to respond to the command CreateNewVirtualObject with a failed to do this task message.
     /// </summary>
-    public class CreateNewVirtualObject
-    {
-        public CodeObject codeObject;
-        public int codeObjectID;
-        public string messageID;
-        public CreateNewVirtualObject(string _messageID, int _codeObjectID, CodeObject _codeObject)
-        {
-            messageID = _messageID;
-            codeObject = _codeObject;
-            codeObjectID = _codeObjectID;
-        }
-    }
-    /// <summary>
-    /// this is the respond to the created object
-    /// </summary>
-    public class RespondCreateNewVirtualObject
+    public class FailedToCreateNewVirtualObject
     {
         public string messageID;
-        public RespondCreateNewVirtualObject(string _messageID)
+
+        public FailedToCreateNewVirtualObject(string _messageID)
         {
             messageID = _messageID;
         }
     }
 
     /// <summary>
-    /// here the sense of this message is that if we got the message NewFrameArrived with a specific messageID,
-    /// then we should work with that frame and if the work is succesfully done we should respond with that 
-    /// message type and with the same messageID as the request came and then the control Actor knows that
-    /// the frame was successfully done
+    /// with this message we are able to respond to the command KillVirtualObject with a failed to do this task message.
     /// </summary>
-    public class RespondNewFrameArrived
+    public class FailedToKillVirtualObject
     {
         public string messageID;
-        public RespondNewFrameArrived(string _messageID)
+
+        public FailedToKillVirtualObject(string _messageID)
         {
             messageID = _messageID;
         }
