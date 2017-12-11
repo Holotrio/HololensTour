@@ -6,6 +6,9 @@ using System.Threading;
 
 namespace TourBackend
 {
+
+    // Collection of general constructor tests
+
     [TestClass]
     public class ControlToSyncActorProtocol
     {

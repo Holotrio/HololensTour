@@ -11,6 +11,11 @@ using Emgu.CV;
 
 namespace TourBackend
 {
+    /// <summary>
+    /// Since there currently is no System.Drawing.Bitmap on .NET Core 2.0,
+    /// we need algorithms to convert .bmp data to
+    /// Emgu Image data.
+    /// </summary>
     [TestClass]
     public class BitmapToImageTest
     {
@@ -73,6 +78,10 @@ namespace TourBackend
             }
         }
     }
+
+    /// <summary>
+    /// Simple class to easily switch from one frame in a dict to another
+    /// </summary>
     [TestClass]
     public class CommandTestFramesTest {
 

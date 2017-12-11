@@ -13,6 +13,9 @@ namespace TourBackend
     public class CameraFeedActor_UnitTest
     {
 
+        ///<summary>
+        ///General Constructor test
+        /// </summary>
         [TestMethod]
         public void Constructor_CameraFeedSyncObject_Test()
         {
@@ -20,6 +23,11 @@ namespace TourBackend
             Assert.AreEqual(test.id, "new");
 
         }
+
+        ///<summary>
+        ///When UpdateFrame is called, an event must be raised s.t. the framework knows 
+        ///that there has been an update.
+        ///</summary>
         [TestMethod]
         public void CameraFeedSyncObject_must_raise_event_when_UpdateFrame_is_called()
         {
@@ -36,7 +44,9 @@ namespace TourBackend
 
             Assert.AreEqual(eventreceived, true);
         }
-
+        /// <summary>
+        /// General constuctor test
+        /// </summary>
         [TestMethod]
         public void NewFrameArrived_must_be_correctly_constructed() {
 
@@ -54,7 +64,10 @@ namespace TourBackend
 
         }
 
-        /// <summary>Test if CameraFeedSyncObject fires an event FramUpdated and CameraFeedActor listens to it and sends NewFrameArrived to ctrlpid</summary>
+        /// <summary>Test if CameraFeedSyncObject fires an event 
+        /// FrameUpdated and CameraFeedActor listens to it and 
+        /// sends NewFrameArrived to ctrlpid
+        /// </summary>
         [TestMethod]
         public void CameraFeedActor_needs_to_get_update_from_CameraFeedSyncObject_when_using_local_frames()
         {

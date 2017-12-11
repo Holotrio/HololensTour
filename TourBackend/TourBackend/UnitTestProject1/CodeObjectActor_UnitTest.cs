@@ -10,6 +10,9 @@ namespace TourBackend
     [TestClass]
     public class CodeObjectActor_UnitTest
     {
+        /// <summary>
+        /// General constructor test
+        /// </summary>
         [TestMethod]
         public void UpdateCodeObjectActor_must_be_constructed_correctly()
         {
@@ -19,7 +22,9 @@ namespace TourBackend
             CollectionAssert.AreEqual(update.position, new[] { 1d, 2d, 3d });
             CollectionAssert.AreEqual(update.rotation, new[] { 7d, 15d, 28d });
         }
-
+        /// <summary>
+        /// General constructor test
+        /// </summary>
         [TestMethod]
         public void RequestCodeObject_must_be_constructed_correctly()
         {
@@ -30,6 +35,10 @@ namespace TourBackend
             Assert.AreEqual(request.messageid, "message1");
         }
 
+        /// <summary>
+        /// DEPRECATED
+        /// </summary>
+        /// <returns></returns>
         [TestMethod]
         public async Task CodeObjectActor_must_respond_to_RequestCodeObject()
         {
@@ -45,6 +54,10 @@ namespace TourBackend
             CollectionAssert.AreEqual(reply.codeobject.rotation, new[] { 4d, 15d });
         }
 
+        /// <summary>
+        /// DEPRECATED
+        /// </summary>
+        /// <returns></returns>
         [TestMethod]
         public async Task CodeObject_must_be_activatable() {
             var propsCOActor = Actor.FromProducer(() => new CodeObjectActor(3, false));
@@ -61,6 +74,10 @@ namespace TourBackend
             Assert.AreEqual(reply2.codeobject.isActive, true);
         }
 
+        /// <summary>
+        /// DEPRECATED
+        /// </summary>
+        /// <returns></returns>
         public async Task CodeObject_must_be_deactivatable()
         {
             var propsCOActor = Actor.FromProducer(() => new CodeObjectActor(4));

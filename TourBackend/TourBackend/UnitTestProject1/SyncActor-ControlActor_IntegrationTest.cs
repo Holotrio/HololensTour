@@ -11,6 +11,10 @@ namespace TourBackend
 {
     class SyncActor_ControlActor_IntegrationTest
     {
+        /// <summary>
+        /// Since Control Actor initializes RecognitionManager, SyncActor & CameraFeedSyncActor,
+        /// it must do so correctly
+        /// </summary>
         [TestMethod]
         public async Task ControlActor_must_correctly_initialize_SyncActor_which_works()
         {

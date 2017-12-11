@@ -13,6 +13,12 @@ namespace TourBackend
     [TestClass]
     public class UnitTest1
     {
+        /// <summary>
+        /// Final integration test. 
+        /// Once a frame, which is correctly put into the framework
+        /// produces valid data at the output,
+        /// the framework basically works.
+        /// </summary>
         [TestMethod]
         public void A_single_frame_needs_to_travel_from_CameraFeedSyncObject_To_SyncActor_with_mock_Frames()
         {
