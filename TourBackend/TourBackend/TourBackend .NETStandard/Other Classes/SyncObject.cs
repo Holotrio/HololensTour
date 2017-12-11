@@ -20,6 +20,24 @@ namespace TourBackend
             dict = _dict;
         }
 
+
+        // Enables event based communication with user
+        public event EventHandler SyncObjectUpdated;
+
+        protected void OnSyncObjectUpdated(EventArgs e)
+        {
+            EventHandler handler = SyncObjectUpdated;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+
+        public void UpdateSyncObject()
+        {
+            OnSyncObjectUpdated(EventArgs.Empty);
+        }
+
         public void SetTimeStamp(Int64 _timestamp)
         {
             this.timestamp = _timestamp;
