@@ -58,6 +58,7 @@ namespace TourBackend
                         syncobject.SetTimeStamp(stopwatch.ElapsedMilliseconds);
                         syncobject.dict = new Dictionary<int, CodeObject>(w.IDToCodeObject);
                     }
+                    syncobject.UpdateSyncObject();
                     context.Sender.Tell(new RespondWriteCurrentTourState(w.id));
                     Console.WriteLine("SyncActor says: Current State was written.");
                     break;
