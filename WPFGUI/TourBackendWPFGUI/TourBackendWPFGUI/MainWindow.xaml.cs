@@ -26,18 +26,20 @@ namespace TourBackendWPFGUI
     public partial class MainWindow : Window
 
     {
-
-        public double x_marker = 0;
-        public double y_marker = 0;
-
-        public double windowHeight = 350;
-        public double windowWidth = 525;
-
+        //***********************************************************
+        //Parameters
         public double frameHeight = 190;
         public double frameWidth = 262.5;
 
         public double hololensWindowHeight = 504;
         public double hololensWindowWidth = 896;
+
+        //Variables
+        public double x_marker = 0;
+        public double y_marker = 0;
+        
+        public double windowHeight = 350;
+        public double windowWidth = 525;
 
         public SyncObject syncObject;
         public Dictionary<int, CodeObject> CopyOfDict;// = new Dictionary<string, CodeObject>();
@@ -54,9 +56,13 @@ namespace TourBackendWPFGUI
 
         public Stopwatch stopwatch;
 
+        //***********************************************************
 
+        //1) Startfunction
         public MainWindow()
         {/*
+            Idea how to replace the Markerpointer from the xaml by the code behind
+
             Rectangle rect = new Rectangle(10, 10, 100, 100);
             Color red = Color.FromRgb(255, 0, 0);
             Brush brush = new SolidColorBrush(red);
@@ -64,11 +70,22 @@ namespace TourBackendWPFGUI
             Point point = new Point(0, 0);
             DrawingContext.DrawEllipse(brush, pen, point, 10, 10);
             */
+
+
             InitializeComponent();
-            Canvas.SetBottom(Markerpointer2, 0);
+
+            //Set Markerpointer to (0,0) will be replaced so that the markerpointer only shows when a detected marker was choosen
+            Canvas.SetBottom(Markerpointer, 0);
+
+            //Get the actual window size 
             windowHeight = Height;
             windowWidth = Width;
 
+            
+            /*
+             
+            Different ways to create a new item in the combobox
+             
             ComboBoxItem comboBoxItem = new ComboBoxItem();
             comboBoxItem.Content = "id_1";
             Markers.Items.Add(comboBoxItem);
@@ -85,23 +102,59 @@ namespace TourBackendWPFGUI
             Markers.Items.Insert(1, textBlock2);
 
             Marker4.Text = "id_265";
+            */
 
 
-            //Initialisierung SyncObject
+            
+            //creating stopwatch which will be used in framework
             stopwatch = new Stopwatch();
             stopwatch.Start();
             lasttimestamp = stopwatch.ElapsedMilliseconds;
+
+            //Initialisierung SyncObject
             syncObject = new SyncObject("syncid", new Dictionary<int, CodeObject>());
             syncObject.SetTimeStamp(lasttimestamp);
             CopyOfDict = new Dictionary<int, CodeObject>();
-
+            
             syncObject.SyncObjectUpdated += OnSyncObjectUpdated;
 
             cameraFeedSyncObject = new CameraFeedSyncObject("initial_id");
 
         }
+        //***********************************************************
+
+        //2) Framework related functions
+
+        /// <summary>
+        /// <para>WPF GUI to Framework</para>
+        /// <para>Updates Camerfeedsyncobjects with the bitmap of the selected picture</para>
+        /// </summary>
+        /// <param name="_id"></param>
+        /// <param name="_bitmap"></param>
+        public void UpdateCamerFeedSyncObject(string _id, Bitmap _bitmap)
+        {
+            cameraFeedSyncObject.id = _id;
+            cameraFeedSyncObject.timestamp = stopwatch.ElapsedMilliseconds;
+            cameraFeedSyncObject.bitmap = bitmap;
+            cameraFeedSyncObject.UpdateFrame();
+        }
+
+        /// <summary>
+        /// <para>Framework to WPF GUI</para>
+        /// <para>Event which will call GetTourState when SyncObject is updated</para>
+        /// </summary>
+        /// <param name="Sender"></param>
+        /// <param name="e"></param>
+        protected void OnSyncObjectUpdated(object Sender, EventArgs e)
+        {
+            GetTourState();
+        }
 
         //ToDo change to Event of changed Syncobject
+
+        /// <summary>
+        /// Gets the new tourstate and adds the detected markers to the combobox
+        /// </summary>
         public void GetTourState()
         {
             if (syncObject.timestamp != lasttimestamp)
@@ -122,28 +175,10 @@ namespace TourBackendWPFGUI
                 }
             }
         }
+        
+        //***********************************************************
 
-        BitmapImage BitmapToImageSource(Bitmap bitmap)
-        {
-            using (MemoryStream memory = new MemoryStream())
-            {
-                bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
-                memory.Position = 0;
-                BitmapImage bitmapimage = new BitmapImage();
-                bitmapimage.BeginInit();
-                bitmapimage.StreamSource = memory;
-                bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapimage.EndInit();
-
-                return bitmapimage;
-            }
-        }
-
-        private void Exit_Click(object sender, RoutedEventArgs e)
-        {
-            //MessageBox.Show("App is closing");
-            this.Close();
-        }
+        //3) Buttons
 
         private void Open_Click(object sender, RoutedEventArgs e)
         {
@@ -169,88 +204,12 @@ namespace TourBackendWPFGUI
             }
         }
 
-        private void BtnMoveMarkerRight_Click(object sender, RoutedEventArgs e)
+        private void Exit_Click(object sender, RoutedEventArgs e)
         {
-            x_marker += 10;
-            Canvas.SetLeft(Markerpointer2, x_marker);
-            pos_x.Text = ((int)x_marker).ToString();
+            //MessageBox.Show("App is closing");
+            this.Close();
         }
 
-        private void BtnMoveMarkerUp_Click(object sender, RoutedEventArgs e)
-        {
-            y_marker += 10;
-            Canvas.SetBottom(Markerpointer2, y_marker);
-            pos_y.Text = ((int)y_marker).ToString();
-        }
-
-        private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            double newWindowHeight = ((System.Windows.Controls.Panel)Application.Current.MainWindow.Content).ActualHeight;
-            double newWindowWidth = ((System.Windows.Controls.Panel)Application.Current.MainWindow.Content).ActualWidth;
-
-            x_marker = (x_marker * newWindowWidth) / windowWidth;
-            y_marker = (y_marker * newWindowHeight) / windowHeight;
-
-            Canvas.SetLeft(Markerpointer2, x_marker);
-            pos_x.Text = ((int)x_marker).ToString();
-
-            Canvas.SetBottom(Markerpointer2, y_marker);
-            pos_y.Text = ((int)y_marker).ToString();
-
-            windowHeight = newWindowHeight;
-            windowWidth = newWindowWidth;
-
-            object eventobject = new object();
-            Markers_DropDownClosed(eventobject, EventArgs.Empty);
-        }
-
-        private void DisplayContentCodeObject()
-        {
-            //Compare Aruco ID with the chosen Marker -> basically parse string to int
-            int id = -1;
-            string stringid = Markers.Text;
-            stringid = stringid.Substring(stringid.LastIndexOf('_') + 1);
-            bool possibleToParse = Int32.TryParse(stringid, out id);
-
-            if (possibleToParse)
-            {
-                CodeObject testobject = new CodeObject(id, new float[] { 350, 2, 290 }, new float[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-
-                if(!CopyOfDict.ContainsKey(id)) CopyOfDict.Add(id, testobject);
-
-                if (CopyOfDict.ContainsKey(id)) 
-                {
-                    CodeObject obj = CopyOfDict[id];
-                    pos_x.Text = obj.position[0].ToString();
-                    pos_y.Text = obj.position[1].ToString();
-                    pos_z.Text = obj.position[2].ToString();
-                    SetPointOnMarker(obj.position);
-                }
-            }
-
-        }
-
-        public void SetPointOnMarker(float[] position)
-        {
-            double xpos = position[0];
-            double zpos = position[2];
-
-            xpos = xpos * (windowWidth * 6f / 11f) / hololensWindowWidth;
-            zpos = zpos * (windowHeight * 4f / 8f) / hololensWindowHeight;
-
-            Canvas.SetLeft(Markerpointer2, xpos);
-            Canvas.SetBottom(Markerpointer2, zpos);
-
-        }
-
-        public void Markers_DropDownClosed(object sender, EventArgs e)
-        {
-            //here you change all the values of the codeobject
-            //MessageBox.Show(Markers.Text);
-            //compare dict and get values
-            DisplayContentCodeObject();
-
-        }
 
         private void Next_Click(object sender, RoutedEventArgs e)
         {
@@ -282,18 +241,117 @@ namespace TourBackendWPFGUI
                 UpdateCamerFeedSyncObject("firstframe_id", bitmap);
             }
         }
+        //***********************************************************
 
-        public void UpdateCamerFeedSyncObject(string _id, Bitmap _bitmap)
+        //4) Displayfunction
+        
+        /// <summary>
+        /// Sets the markerpointer on the frame depending on the size of the window
+        /// </summary>
+        /// <param name="position"></param>
+        public void SetPointOnMarker(float[] position)
         {
-            cameraFeedSyncObject.id = _id;
-            cameraFeedSyncObject.timestamp = stopwatch.ElapsedMilliseconds;
-            cameraFeedSyncObject.bitmap = bitmap;
-            cameraFeedSyncObject.UpdateFrame();
+            double xpos = position[0];
+            double zpos = position[2];
+
+            xpos = xpos * (windowWidth * 6f / 11f) / hololensWindowWidth;
+            zpos = zpos * (windowHeight * 4f / 8f) / hololensWindowHeight;
+
+            Canvas.SetLeft(Markerpointer, xpos);
+            Canvas.SetBottom(Markerpointer, zpos);
+
         }
 
-        protected void OnSyncObjectUpdated(object Sender, EventArgs e)
+        //Event when a marker is selected in the combobox
+        public void Markers_DropDownClosed(object sender, EventArgs e)
         {
-            GetTourState();
+            //here you change all the values of the codeobject
+            //MessageBox.Show(Markers.Text);
+            //compare dict and get values
+            DisplayContentCodeObject();
+
         }
+
+        /// <summary>
+        /// Identify the selected marker and display the relevant data of the framework
+        /// </summary>
+        private void DisplayContentCodeObject()
+        {
+            //Compare Aruco ID with the chosen Marker -> basically parse string to int
+            int id = -1;
+
+            //Dear Moritz, I'd love to hear your way of solving this problem. I get from the Event Markers_DropDownClosed the text atm.
+            //I didn't have time to add a int value to the marker. Sorry I was quite stressed and had a lot of things to do and didn't thing of that
+            //but I know I can do it this way. <sys:Int32>5</sys:Int32>
+            //I will change it tomorrow
+            string stringid = Markers.Text;
+            stringid = stringid.Substring(stringid.LastIndexOf('_') + 1);
+            bool possibleToParse = Int32.TryParse(stringid, out id);
+
+            if (possibleToParse)
+            {
+                CodeObject testobject = new CodeObject(id, new float[] { 350, 2, 290 }, new float[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+
+                if (!CopyOfDict.ContainsKey(id)) CopyOfDict.Add(id, testobject);
+
+                if (CopyOfDict.ContainsKey(id))
+                {
+                    CodeObject obj = CopyOfDict[id];
+                    pos_x.Text = obj.position[0].ToString();
+                    pos_y.Text = obj.position[1].ToString();
+                    pos_z.Text = obj.position[2].ToString();
+                    SetPointOnMarker(obj.position);
+                }
+            }
+
+        }
+
+        //Event which updates the window size and changes the position of the markerpointer
+        private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            double newWindowHeight = ((System.Windows.Controls.Panel)Application.Current.MainWindow.Content).ActualHeight;
+            double newWindowWidth = ((System.Windows.Controls.Panel)Application.Current.MainWindow.Content).ActualWidth;
+
+            x_marker = (x_marker * newWindowWidth) / windowWidth;
+            y_marker = (y_marker * newWindowHeight) / windowHeight;
+
+            Canvas.SetLeft(Markerpointer, x_marker);
+            pos_x.Text = ((int)x_marker).ToString();
+
+            Canvas.SetBottom(Markerpointer, y_marker);
+            pos_y.Text = ((int)y_marker).ToString();
+
+            windowHeight = newWindowHeight;
+            windowWidth = newWindowWidth;
+
+            object eventobject = new object();
+            Markers_DropDownClosed(eventobject, EventArgs.Empty);
+        }
+        //***********************************************************
+
+        //5) Additional needed functions
+
+        /// <summary>
+        /// Converts bitmap to a bitmapimage
+        /// </summary>
+        /// <param name="bitmap"></param>
+        /// <returns></returns>
+        BitmapImage BitmapToImageSource(Bitmap bitmap)
+        {
+            using (MemoryStream memory = new MemoryStream())
+            {
+                bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
+                memory.Position = 0;
+                BitmapImage bitmapimage = new BitmapImage();
+                bitmapimage.BeginInit();
+                bitmapimage.StreamSource = memory;
+                bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapimage.EndInit();
+
+                return bitmapimage;
+            }
+        }
+
+
     }
 }
