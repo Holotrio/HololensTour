@@ -43,6 +43,10 @@ namespace TourBackendUI
             return (await MediaCapture.GetPreviewFrameAsync(frame));
         }
 
+        /// <summary>
+        /// Basically converts a SoftwareBitmap to an Emgu Image
+        /// </summary>
+        /// <returns></returns>
         public async Task<Image<Bgr, byte>> GrabImage()
         {
             if (!Ready) return null;
@@ -86,14 +90,16 @@ namespace TourBackendUI
             }
             return img;
         }
+        /// <summary>
+        /// Returns the Mat stored in the GrabImage Image
+        /// </summary>
+        /// <returns></returns>
         public async Task<Mat> GrabMat()
         {
             if (!Ready) return null;
             Emgu.CV.Image<Bgr, byte> ret = await GrabImage();
 
             return ret.Mat;
-
-            //return await MediaCapture.ToMatAsync();
         }
         public async Task<SoftwareBitmap> GrabAndPreprocess(Func<int, int, int, byte, byte> preprocessing)
         {
@@ -123,6 +129,8 @@ namespace TourBackendUI
             await MediaCapture.StartPreviewAsync();
             Ready = true;
         }
+
+
         private static async Task<DeviceInformation> FindCameraDeviceByPanelAsync(Windows.Devices.Enumeration.Panel desiredPanel)
         {
             // Get available devices for capturing pictures
@@ -136,6 +144,8 @@ namespace TourBackendUI
             // If there is no device mounted on the desired panel, return the first device found
             return desiredDevice ?? allVideoDevices.FirstOrDefault();
         }
+
+
         private unsafe void EditPixels(SoftwareBitmap bitmap, Func<int, int, int, byte, byte> func)
         {
             // Effect is hard-coded to operate on BGRA8 format only

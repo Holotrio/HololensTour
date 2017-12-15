@@ -19,6 +19,11 @@ namespace TourBackendUI
 {
     public static class Helpers
     {
+        /// <summary>
+        /// Converts an Emgu Mat to a WritableBitmap
+        /// </summary>
+        /// <param name="mat">Mat to be converted</param>
+        /// <returns></returns>
         public static WriteableBitmap ToWritableBitmap(this Mat mat)
         {
             var size = mat.Size;
@@ -37,6 +42,11 @@ namespace TourBackendUI
             return bmp;
         }
 
+        /// <summary>
+        /// Converts a StorageFile to an Emgu Mat
+        /// </summary>
+        /// <param name="file">StorageFile to be converted</param>
+        /// <returns></returns>
         public static async Task<Mat> ToMatAsync(this StorageFile file)
         {
             using (var fileStream = await file.OpenAsync(FileAccessMode.Read))
@@ -62,6 +72,11 @@ namespace TourBackendUI
             }
         }
         // Attention: Do NOT use in conjunction with Preview - Doesn't work!
+        /// <summary>
+        /// Is supposed to convert a MediaCapture to an Emgu Mat
+        /// </summary>
+        /// <param name="mediaCapture"></param>
+        /// <returns></returns>
         public static async Task<Mat> ToMatAsync(this MediaCapture mediaCapture)
         {
             using (var stream = new InMemoryRandomAccessStream())

@@ -76,7 +76,10 @@ namespace TourBackendUI
                 1,2,3,4,5,6,7
             };
         }
-
+        /// <summary>
+        /// Initializes to functionality of the UI
+        /// </summary>
+        /// <param name="streamPreview"></param>
         public MainViewModel(ref CaptureElement streamPreview)
         {
             _stream = streamPreview;
@@ -87,12 +90,15 @@ namespace TourBackendUI
             };
             InitCam = new RelayCommand(InitCamera);
             _frameSource = new OnDemandCamera(30);
+
+            //Get a new Frame into the framework once per 40ms
             Timer.Interval = new TimeSpan(0, 0, 0, 0, 40);
             Timer.Tick += GetFrame;
 
             SyncObject.SetTimeStamp(_lasttimestamp);
             SyncObject.SyncObjectUpdated += OnSyncObjectUpdated;
 
+            //Set up the framework such that it recognizes all 1024 "traditional" markers
             CodeObject[] codeobjs = new CodeObject[1024];
             var dict = Utils.HelpForTesting.CreateDictionaryForInitialization(1024);
             foreach (KeyValuePair<int, CodeObject> pair in dict)
@@ -100,6 +106,7 @@ namespace TourBackendUI
                 codeobjs.SetValue(pair.Value, pair.Key - 1);
             }
 
+            //Initialize framework
             _frameWork = new FrameWork(SyncObject, CameraFeedSyncObject, codeobjs);
             _frameWork.Initialize();
 
@@ -107,6 +114,9 @@ namespace TourBackendUI
 
         }
 
+        /// <summary>
+        /// Initializes the camera
+        /// </summary>
         public async void InitCamera()
         {
             var app = Application.Current as App;
@@ -131,6 +141,11 @@ namespace TourBackendUI
 
         }
 
+        /// <summary>
+        /// Helper function to feed new frames into the framework
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void GetFrame(object sender, object e)
         {
             if (_frameSource.Ready)

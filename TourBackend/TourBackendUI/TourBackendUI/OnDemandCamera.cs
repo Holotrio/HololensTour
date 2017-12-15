@@ -12,13 +12,18 @@ namespace TourBackendUI
     {
         private Mat _mat = new Mat();
         private DispatcherTimer _timer = new DispatcherTimer();
+
         public OnDemandCamera(int fps)
         {
             _timer.Interval = TimeSpan.FromMilliseconds(1000d / fps);
             _timer.Tick += Grab;
             _timer.Start();
         }
-
+        /// <summary>
+        /// Gets a new Mat from the Camera.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="ea"></param>
         private async void Grab(object sender, object ea)
         {
             var app = Application.Current as App;
