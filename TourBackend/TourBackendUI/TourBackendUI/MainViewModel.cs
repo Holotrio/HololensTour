@@ -32,7 +32,7 @@ namespace TourBackendUI
 
         public Int64 inputtime;
         public Int64 outputtime;
-        public Int64 rtt;
+        public Int64 _rtt;
 
         //int numbersOfMarker = 1;
 
@@ -43,6 +43,15 @@ namespace TourBackendUI
             {
                 if (Equals(value, _mediaCapture)) return;
                 _mediaCapture = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public String rtt
+        {
+            get { return _rtt.ToString(); }
+            set
+            {
                 OnPropertyChanged();
             }
         }
@@ -144,11 +153,14 @@ namespace TourBackendUI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        protected void OnSyncObjectUpdated(object sender, EventArgs e)
+        protected async void OnSyncObjectUpdated(object sender, EventArgs e)
         {
             GetTourState();
             outputtime = DateTime.Now.Ticks;
-            rtt = outputtime - inputtime;
+            _rtt = (outputtime - inputtime)/10000;
+            string display = _rtt.ToString() + " ms";
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,()=> rtt = display);
+            
             // Make it shine, boy
         }
 
