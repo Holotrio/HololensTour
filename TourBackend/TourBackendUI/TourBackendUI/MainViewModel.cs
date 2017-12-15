@@ -78,15 +78,13 @@ namespace TourBackendUI
                 1,2,3
             };
             InitCam = new RelayCommand(InitCamera);
-            Timer.Interval = new TimeSpan(0, 0, 1);
-            Timer.Tick += GetFrame;
-
+            _frameSource = new OnDemandCamera(30);
+            Timer.Interval = new TimeSpan(0, 0, 0, 0, 40);
+            Timer.Tick += GetFrame; 
 
             SyncObject.SetTimeStamp(_lasttimestamp);
-
             SyncObject.SyncObjectUpdated += OnSyncObjectUpdated;
-            _frameSource = new OnDemandCamera(30);
-
+            
             CodeObject[] codeobjs = new CodeObject[1024];
             var dict = Utils.HelpForTesting.CreateDictionaryForInitialization(1024);
             foreach (KeyValuePair<int, CodeObject> pair in dict) {
@@ -132,7 +130,6 @@ namespace TourBackendUI
                 var frame = _frameSource.Mat.Clone();
                 inputtime = DateTime.Now.Ticks;
                 CameraFeedSyncObject.UpdateCameraFeedSyncObject(inputtime, frame);
-                
             }
         }
 
@@ -164,17 +161,22 @@ namespace TourBackendUI
             if (SyncObject.timestamp != _lasttimestamp)
             {
                 _lasttimestamp = SyncObject.timestamp;
-                CopyOfDict = DeepCopy.CopyInt(SyncObject.dict);
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => Markers.Clear());
                 //ReadDictionaryData
-                foreach (int objectid in SyncObject.dict.Keys)
+                int[] tempmarkers = new int[Markers.Count];
+                Markers.CopyTo(tempmarkers, 0);
+                foreach (int objectid in tempmarkers)
                 {
                     //CodeObject with current key
-                    CodeObject obj = CopyOfDict[objectid];
-
-                    //Add items to dropdownlist 
-                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => Markers.Add(obj.id));
-
+                    if (SyncObject.dict.ContainsKey(objectid)) {
+                        
+                    } else if (!SyncObject.dict.ContainsKey(objectid)) {
+                        await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => Markers.Remove(objectid));
+                    }
+                }
+                foreach (int objectid in SyncObject.dict.Keys) {
+                    if (!Markers.Contains(objectid)) {
+                        await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => Markers.Add(objectid));
+                    }
                 }
             }
         }

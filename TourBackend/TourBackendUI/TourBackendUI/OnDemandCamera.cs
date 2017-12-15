@@ -35,7 +35,7 @@ namespace TourBackendUI
 
         private App App => Application.Current as App;
         private WebcamReciever WebcamReciever => App?.WebcamReciever;
-        public bool Ready => WebcamReciever != null && WebcamReciever.Ready;
+        public bool Ready => WebcamReciever != null && WebcamReciever.Ready && _mat != null;
         public Mat Mat => Ready ? _mat : throw new InvalidOperationException("camera not ready");
         public WriteableBitmap WriteableBitmap => Mat.ToWritableBitmap();
         public Image<Bgr, byte> ImageBgrByte => Mat.ToImage<Bgr, byte>();
