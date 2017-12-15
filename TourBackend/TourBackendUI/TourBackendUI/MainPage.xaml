@@ -1,0 +1,35 @@
+﻿<Page x:Name="ObjectRoot"
+    x:Class="TourBackendUI.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TourBackendUI"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid x:Name="LayoutRoot" Background="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <Grid.DataContext>
+            <local:MainViewModel/>
+        </Grid.DataContext>
+
+        <CaptureElement x:Name="PreviewControl" Stretch="Uniform" Source="{Binding MediaCapture}"/>
+        <ListBox Grid.Row="0" Background="Transparent" HorizontalAlignment="Left" VerticalAlignment="Center" ItemsSource="{Binding Markers}" Margin="200 0 0 0" Width="200">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.5" Background="White" Width="150">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="50" Text="{Binding}"></TextBlock>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        
+        <StackPanel Grid.Row="1">
+            <Button Content="Init Camera" Command="{Binding InitCam}"/>
+        </StackPanel>
+        
+    </Grid>
+</Page>

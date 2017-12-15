@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Proto;
 using System.Drawing;
 using Emgu.CV;
+using System.Diagnostics;
 
 namespace TourBackend
 {
@@ -63,7 +64,8 @@ namespace TourBackend
                     latestBitmap = sync.bitmap;
                     latestTimestamp = sync.timestamp;
                 }
-                ctrlActor.Tell(new NewFrameArrived(latestTimestamp.ToString(), latestBitmap));
+                Debug.WriteLine("CamSync: " + latestBitmap.Width);
+                ctrlActor.Tell(new NewFrameArrived(latestTimestamp.ToString(), latestBitmap.Clone()));
                 Console.WriteLine("CameraFeedSyncObject says: New Frame Arrived");
             }
         }

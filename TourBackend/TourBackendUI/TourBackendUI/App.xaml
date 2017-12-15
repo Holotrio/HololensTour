@@ -1,0 +1,11 @@
+﻿<Application
+    x:Class="TourBackendUI.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TourBackendUI"
+    RequestedTheme="Light">
+    <Application.Resources>
+        <BitmapImage x:Key="Frame0" UriSource="Resources/aruco_265.jpg"></BitmapImage>
+        <BitmapImage x:Key="Frame1" UriSource="Resources/frame59.png"></BitmapImage>
+    </Application.Resources>
+</Application>

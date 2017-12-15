@@ -57,13 +57,7 @@ namespace TourBackend
                     lock (syncobject.thisLock)
                     {
                         syncobject.SetTimeStamp(stopwatch.ElapsedMilliseconds);
-                        try
-                        {
-                            syncobject.dict = CopySyncDict.Copy(w.IDToCodeObject);
-                        }
-                        catch (Exception e) {
-                            Console.WriteLine(e.StackTrace);
-                        }
+                        syncobject.dict = CopySyncDict.Copy(w.IDToCodeObject);
                     }
                     context.Sender.Tell(new RespondWriteCurrentTourState(w.id));
                     syncobject.UpdateSyncObject();

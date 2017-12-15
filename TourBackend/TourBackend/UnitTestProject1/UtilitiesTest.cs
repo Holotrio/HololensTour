@@ -10,7 +10,7 @@ using Emgu.CV.Aruco;
 using Emgu.CV;
 
 namespace TourBackend
-{
+{/*
     [TestClass]
     public class BitmapToImageTest
     {
@@ -73,7 +73,7 @@ namespace TourBackend
             }
             
         }
-    }
+    }*/
     [TestClass]
     public class CommandTestFramesTest {
 
@@ -91,18 +91,15 @@ namespace TourBackend
             path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             path1 = Path.Combine(path, "Resources");
-            path1 = Path.Combine(path1, "TestFrames");
-            path1 = Path.Combine(path1, "TestVideo_000.bmp");
+            path1 = Path.Combine(path1, "ArucoCode_ID_1.bmp");
             bitmaps[0] = new Mat(path1);
 
             path2 = Path.Combine(path, "Resources");
-            path2 = Path.Combine(path2, "TestFrames");
-            path2 = Path.Combine(path2, "TestVideo_001.bmp");
+            path2 = Path.Combine(path2, "ArucoCode_ID_1.bmp");
             bitmaps[1] = new Mat(path2);
 
             path3 = Path.Combine(path, "Resources");
-            path3 = Path.Combine(path3, "TestFrames");
-            path3 = Path.Combine(path3, "TestVideo_002.bmp");
+            path3 = Path.Combine(path3, "ArucoCode_ID_1.bmp");
             bitmaps[2] = new Mat(path3);
 
             cmnd = new CommandTestFrames(bitmaps);
@@ -124,18 +121,15 @@ namespace TourBackend
             path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             path1 = Path.Combine(path, "Resources");
-            path1 = Path.Combine(path1, "TestFrames");
-            path1 = Path.Combine(path1, "TestVideo_000.bmp");
+            path1 = Path.Combine(path1, "ArucoCode_ID_1.bmp");
             bitmaps[0] = new Mat(path1);
 
             path2 = Path.Combine(path, "Resources");
-            path2 = Path.Combine(path2, "TestFrames");
-            path2 = Path.Combine(path2, "TestVideo_001.bmp");
+            path2 = Path.Combine(path2, "ArucoCode_ID_1.bmp");
             bitmaps[1] = new Mat(path2);
 
             path3 = Path.Combine(path, "Resources");
-            path3 = Path.Combine(path3, "TestFrames");
-            path3 = Path.Combine(path3, "TestVideo_002.bmp");
+            path3 = Path.Combine(path3, "ArucoCode_ID_1.bmp");
             bitmaps[2] = new Mat(path3);
 
             cmnd = new CommandTestFrames(bitmaps);
@@ -164,18 +158,15 @@ namespace TourBackend
             path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             path1 = Path.Combine(path, "Resources");
-            path1 = Path.Combine(path1, "TestFrames");
-            path1 = Path.Combine(path1, "TestVideo_000.bmp");
+            path1 = Path.Combine(path1, "ArucoCode_ID_1.bmp");
             bitmaps[0] = new Mat(path1);
 
             path2 = Path.Combine(path, "Resources");
-            path2 = Path.Combine(path2, "TestFrames");
-            path2 = Path.Combine(path2, "TestVideo_001.bmp");
+            path2 = Path.Combine(path2, "ArucoCode_ID_1.bmp");
             bitmaps[1] = new Mat(path2);
 
             path3 = Path.Combine(path, "Resources");
-            path3 = Path.Combine(path3, "TestFrames");
-            path3 = Path.Combine(path3, "TestVideo_002.bmp");
+            path3 = Path.Combine(path3, "ArucoCode_ID_1.bmp");
             bitmaps[2] = new Mat(path3);
 
             cmnd = new CommandTestFrames(bitmaps);
@@ -202,18 +193,15 @@ namespace TourBackend
             path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             path1 = Path.Combine(path, "Resources");
-            path1 = Path.Combine(path1, "TestFrames");
-            path1 = Path.Combine(path1, "TestVideo_000.bmp");
+            path1 = Path.Combine(path1, "ArucoCode_ID_1.bmp");
             bitmaps[0] = new Mat(path1);
 
             path2 = Path.Combine(path, "Resources");
-            path2 = Path.Combine(path2, "TestFrames");
-            path2 = Path.Combine(path2, "TestVideo_001.bmp");
+            path2 = Path.Combine(path2, "ArucoCode_ID_1.bmp");
             bitmaps[1] = new Mat(path2);
 
             path3 = Path.Combine(path, "Resources");
-            path3 = Path.Combine(path3, "TestFrames");
-            path3 = Path.Combine(path3, "TestVideo_002.bmp");
+            path3 = Path.Combine(path3, "ArucoCode_ID_1.bmp");
             bitmaps[2] = new Mat(path3);
             cmnd = new CommandTestFrames(bitmaps);
 
@@ -235,18 +223,15 @@ namespace TourBackend
             path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             path1 = Path.Combine(path, "Resources");
-            path1 = Path.Combine(path1, "TestFrames");
-            path1 = Path.Combine(path1, "TestVideo_000.bmp");
+            path1 = Path.Combine(path1, "ArucoCode_ID_1.bmp");
             bitmaps[0] = new Mat(path1);
 
             path2 = Path.Combine(path, "Resources");
-            path2 = Path.Combine(path2, "TestFrames");
-            path2 = Path.Combine(path2, "TestVideo_001.bmp");
+            path2 = Path.Combine(path2, "ArucoCode_ID_1.bmp");
             bitmaps[1] = new Mat(path2);
 
             path3 = Path.Combine(path, "Resources");
-            path3 = Path.Combine(path3, "TestFrames");
-            path3 = Path.Combine(path3, "TestVideo_002.bmp");
+            path3 = Path.Combine(path3, "ArucoCode_ID_1.bmp");
             bitmaps[2] = new Mat(path3);
 
             cmnd = new CommandTestFrames(bitmaps);

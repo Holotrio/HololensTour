@@ -43,7 +43,7 @@ namespace TourBackend
 
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path = Path.Combine(path, "Resources");
-            path = Path.Combine(path, "TestVideo_007.bmp");
+            path = Path.Combine(path, "ArucoCode_ID_1.bmp");
             
             var testframe = new Mat(path);
 
@@ -76,7 +76,7 @@ namespace TourBackend
             // Creates a testframe from local bitmaps
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path = Path.Combine(path, "Resources");
-            path = Path.Combine(path, "TestVideo_007.bmp");
+            path = Path.Combine(path, "ArucoCode_ID_1.bmp");
             var testframe = new Mat(path);
 
             lock (test.thisLock)
