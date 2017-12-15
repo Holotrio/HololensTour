@@ -33,7 +33,7 @@ namespace TourBackend
             // Creates a testframe from local bitmaps
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path = Path.Combine(path, "Resources");
-            path = Path.Combine(path, "ArucoCode_ID_1.bmp");
+            path = Path.Combine(path, "Webcam_Aruco.jpg");
             var testframe =  new Mat(path);
 
             lock (camerafeedsyncobject.thisLock)
@@ -56,6 +56,9 @@ namespace TourBackend
             //Console.WriteLine(syncobject.dict[1].id);
 
             // Fail test if syncobj hasn't been updated
+
+            Assert.IsFalse(syncobject.dict.ContainsKey(2));
+            Assert.IsFalse(syncobject.dict.ContainsKey(7));
             Assert.IsTrue(syncobject.dict.ContainsKey(1));
 
             Assert.IsTrue(Math.Abs(syncobject.dict[1].position[0] - dict[1].position[0])<0.01d);
