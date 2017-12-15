@@ -39,7 +39,7 @@ namespace TourBackendUI
         public async Task<VideoFrame> Grab(MediaStreamType streamType = MediaStreamType.VideoPreview)
         {
             var frameProperties = MediaCapture.VideoDeviceController.GetMediaStreamProperties(streamType) as VideoEncodingProperties;
-            var frame = new VideoFrame(BitmapPixelFormat.Bgra8, (int) frameProperties.Width, (int) frameProperties.Height);
+            var frame = new VideoFrame(BitmapPixelFormat.Bgra8, (int)frameProperties.Width, (int)frameProperties.Height);
             return (await MediaCapture.GetPreviewFrameAsync(frame));
         }
 
@@ -78,7 +78,7 @@ namespace TourBackendUI
 
                                 // Boost the green channel, leave the other two untouched
 
-                                img[row,col] = new Bgr(data[currPixel + 0], data[currPixel + 1], data[currPixel + 2]);
+                                img[row, col] = new Bgr(data[currPixel + 0], data[currPixel + 1], data[currPixel + 2]);
                             }
                         }
                     }
@@ -89,11 +89,11 @@ namespace TourBackendUI
         public async Task<Mat> GrabMat()
         {
             if (!Ready) return null;
-            //Emgu.CV.Image<Bgr, byte> ret = await GrabImage();
+            Emgu.CV.Image<Bgr, byte> ret = await GrabImage();
 
-            //return ret.Mat;
-           
-            return await MediaCapture.ToMatAsync();
+            return ret.Mat;
+
+            //return await MediaCapture.ToMatAsync();
         }
         public async Task<SoftwareBitmap> GrabAndPreprocess(Func<int, int, int, byte, byte> preprocessing)
         {
@@ -112,7 +112,9 @@ namespace TourBackendUI
 
             await MediaCapture.InitializeAsync(new MediaCaptureInitializationSettings
             {
-                VideoDeviceId = Device.Id
+                VideoDeviceId = Device.Id,
+                StreamingCaptureMode = Windows.Media.Capture.StreamingCaptureMode.Video,
+                PhotoCaptureSource = Windows.Media.Capture.PhotoCaptureSource.VideoPreview
             });
 
             StreamPreview.FlowDirection = FlowDirection.LeftToRight;

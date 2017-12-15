@@ -24,7 +24,6 @@ namespace TourBackendUI
         public Dictionary<int, CodeObject> CopyOfDict = new Dictionary<int, CodeObject>();
 
         private readonly OnDemandCamera _frameSource;
-        CommandTestFrames _frames;
 
         readonly FrameWork _frameWork;
         private MediaCapture _mediaCapture;
@@ -84,20 +83,21 @@ namespace TourBackendUI
 
             Markers = new ObservableCollection<int>
             {
-                1,2,3
+
             };
             InitCam = new RelayCommand(InitCamera);
             _frameSource = new OnDemandCamera(30);
             Timer.Interval = new TimeSpan(0, 0, 0, 0, 40);
-            Timer.Tick += GetFrame; 
+            Timer.Tick += GetFrame;
 
             SyncObject.SetTimeStamp(_lasttimestamp);
             SyncObject.SyncObjectUpdated += OnSyncObjectUpdated;
-            
+
             CodeObject[] codeobjs = new CodeObject[1024];
             var dict = Utils.HelpForTesting.CreateDictionaryForInitialization(1024);
-            foreach (KeyValuePair<int, CodeObject> pair in dict) {
-                codeobjs.SetValue(pair.Value, pair.Key-1);
+            foreach (KeyValuePair<int, CodeObject> pair in dict)
+            {
+                codeobjs.SetValue(pair.Value, pair.Key - 1);
             }
 
             _frameWork = new FrameWork(SyncObject, CameraFeedSyncObject, codeobjs);
@@ -127,7 +127,6 @@ namespace TourBackendUI
             catch (Exception e)
             {
                 Debug.WriteLine("Initializing camera failed:");
-               // Debug.WriteLine(e);
             }
 
         }
@@ -157,11 +156,8 @@ namespace TourBackendUI
         {
             GetTourState();
             outputtime = DateTime.Now.Ticks;
-            _rtt = (outputtime - inputtime)/10000;
-            string display = _rtt.ToString() + " ms";
-            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,()=> rtt = display);
-            
-            // Make it shine, boy
+            _rtt = (outputtime - inputtime) / 10000;
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => rtt = _rtt.ToString());
         }
 
 
@@ -179,14 +175,15 @@ namespace TourBackendUI
                 foreach (int objectid in tempmarkers)
                 {
                     //CodeObject with current key
-                    if (SyncObject.dict.ContainsKey(objectid)) {
-                        
-                    } else if (!SyncObject.dict.ContainsKey(objectid)) {
+                    if (!SyncObject.dict.ContainsKey(objectid))
+                    {
                         await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => Markers.Remove(objectid));
                     }
                 }
-                foreach (int objectid in SyncObject.dict.Keys) {
-                    if (!Markers.Contains(objectid)) {
+                foreach (int objectid in SyncObject.dict.Keys)
+                {
+                    if (!Markers.Contains(objectid))
+                    {
                         await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => Markers.Add(objectid));
                     }
                 }

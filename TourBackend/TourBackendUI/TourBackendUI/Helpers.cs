@@ -61,28 +61,33 @@ namespace TourBackendUI
                 }
             }
         }
-
+        // Attention: Do NOT use in conjunction with Preview - Doesn't work!
         public static async Task<Mat> ToMatAsync(this MediaCapture mediaCapture)
         {
             using (var stream = new InMemoryRandomAccessStream())
             {
                 //await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () => await mediaCapture.CapturePhotoToStreamAsync(Windows.Media.MediaProperties.ImageEncodingProperties.CreatePng(), stream));
+                await mediaCapture.StopPreviewAsync();
                 await mediaCapture.CapturePhotoToStreamAsync(Windows.Media.MediaProperties.ImageEncodingProperties.CreatePng(), stream);
+                await mediaCapture.StartPreviewAsync();
                 stream.Seek(0);
                 var data = new byte[stream.Size];
                 await stream.AsStreamForRead().ReadAsync(data, 0, data.Length);
+                stream.Dispose();
                 var result = new Mat();
                 if (data.Length != 0)
                 {
                     CvInvoke.Imdecode(data, ImreadModes.AnyColor, result);
                 }
-                else {
+                else
+                {
                     Debug.WriteLine("Buffer length = 0");
                 }
                 //var img = result.ToImage<Bgr, byte>();
                 //var s = img.ToJpegData();
                 //Debug.WriteLine(Convert.ToBase64String(s));
                 return result;
+
             }
         }
     }

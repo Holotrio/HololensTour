@@ -22,7 +22,7 @@ namespace TourBackendUI
         private async void Grab(object sender, object ea)
         {
             var app = Application.Current as App;
-            if (app?.WebcamReciever?.MediaCapture == null) return;
+            if (app?.WebcamReciever?.MediaCapture == null  || Ready == false) return;
             try
             {
                 _mat = await app.WebcamReciever.GrabMat();
