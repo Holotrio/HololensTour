@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Proto;
 using System.Drawing;
+using Emgu.CV;
 
 namespace TourBackend
 {
@@ -14,31 +15,18 @@ namespace TourBackend
     public class NewFrameArrived
     {
         public string id;
-        public Bitmap bitmap;
+        public Mat bitmap;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="_id">Message ID</param>
         /// <param name="_bitmap">Bitmap which arrived</param>
-        public NewFrameArrived(string _id, Bitmap _bitmap)
+        public NewFrameArrived(string _id, Mat _bitmap)
         {
                 id = _id;
                 bitmap = _bitmap;
         }
     }
 
-    /// <summary>
-    /// with this message type we are able to respond to the command NewFrameArrived in the sense that
-    /// the work with the frame was successfully done
-    /// </summary>
-    public class RespondNewFrameArrived
-    {
-        public string messageID;
-
-        public RespondNewFrameArrived(string _messageID)
-        {
-            messageID = _messageID;
-        }
-    }
 }

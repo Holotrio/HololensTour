@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
+using Emgu.CV;
 
 namespace TourBackend
 {
@@ -10,7 +11,7 @@ namespace TourBackend
 
         public Int64 timestamp;
 
-        public Bitmap bitmap;
+        public Mat bitmap;
         public string id;
         public object thisLock = new Object();
 

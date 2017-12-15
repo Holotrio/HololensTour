@@ -11,10 +11,10 @@ namespace TourBackend
     /// </summary>
     public class CommandTestFrames
     {
-        public Bitmap[] frames;
+        public Mat[] frames;
         public int currentIdx;
 
-        public CommandTestFrames(Bitmap[] _frames)
+        public CommandTestFrames(Mat[] _frames)
         {
             frames = _frames;
             currentIdx = 0;
@@ -24,9 +24,9 @@ namespace TourBackend
         /// Return the Bitmap at the current position in the array and set the current position to the next Bitmap. [External Use]
         /// </summary>
         /// <returns>Current Bitmap</returns>
-        public System.Drawing.Bitmap ReturnAndSetNextFrame()
+        public Mat ReturnAndSetNextFrame()
         {
-            Bitmap returnvalue = frames[currentIdx];
+            Mat returnvalue = frames[currentIdx];
             if (currentIdx == frames.Length - 1)
             {
                 currentIdx = 0;
@@ -42,9 +42,9 @@ namespace TourBackend
         /// Return the Bitmap at the current position in the array and set the current position to the previous Bitmap. [External Use]
         /// </summary>
         /// <returns>Current Bitmap</returns>
-        public System.Drawing.Bitmap ReturnAndSetPreviousFrame()
+        public Mat ReturnAndSetPreviousFrame()
         {
-            Bitmap returnvalue = frames[currentIdx];
+            Mat returnvalue = frames[currentIdx];
             if (currentIdx == 0)
             {
                 currentIdx = frames.Length - 1;
@@ -60,7 +60,7 @@ namespace TourBackend
         /// Return the Bitmap at the current position in the array and leave the position at the current Bitmap. [External Use]
         /// </summary>
         /// <returns>Current Bitmap</returns>
-        public System.Drawing.Bitmap GetCurrentFrame()
+        public Mat GetCurrentFrame()
         {
             return frames[currentIdx];
         }

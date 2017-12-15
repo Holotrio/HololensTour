@@ -53,13 +53,20 @@ namespace TourBackend
                  should make the current data available to the user*/
 
                 case WriteCurrentTourState w:
+                    Debug.WriteLine($"Tesla: {String.Join(",", w.IDToCodeObject.Keys)}");
                     lock (syncobject.thisLock)
                     {
                         syncobject.SetTimeStamp(stopwatch.ElapsedMilliseconds);
-                        syncobject.dict = new Dictionary<int, CodeObject>(w.IDToCodeObject);
+                        try
+                        {
+                            syncobject.dict = CopySyncDict.Copy(w.IDToCodeObject);
+                        }
+                        catch (Exception e) {
+                            Console.WriteLine(e.StackTrace);
+                        }
                     }
-                    syncobject.UpdateSyncObject();
                     context.Sender.Tell(new RespondWriteCurrentTourState(w.id));
+                    syncobject.UpdateSyncObject();
                     Console.WriteLine("SyncActor says: Current State was written.");
                     break;
             }

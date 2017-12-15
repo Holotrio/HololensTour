@@ -16,16 +16,16 @@ namespace TourBackend
 
         public CodeObject(CodeObject codeobj)
         {
+            if (codeobj != null)
+            {
+                position = new double[3];
+                rotation = new double[9];
 
-            position = new double[3];
-            rotation = new double[9];
-            scaling = new double[3];
-
-            id = codeobj.id;
-            codeobj.position.CopyTo(position, 0);
-            codeobj.rotation.CopyTo(rotation, 0);
-            codeobj.scaling.CopyTo(scaling, 0);
-            isActive = codeobj.isActive;
+                id = codeobj.id;
+                codeobj.position.CopyTo(position, 0);
+                codeobj.rotation.CopyTo(rotation, 0);
+                isActive = codeobj.isActive;
+            }
         }
 
         public CodeObject()
@@ -43,7 +43,7 @@ namespace TourBackend
 
         public CodeObject(int _objectid, double[] _position, double[] _rotation)
         {
-            id = _objectid; ;
+            id = _objectid;
             position = _position;
             rotation = _rotation;
             isActive = true;

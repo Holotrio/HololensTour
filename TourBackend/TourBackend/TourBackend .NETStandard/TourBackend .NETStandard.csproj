@@ -20,14 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Emgu.CV.UI">
-      <HintPath>..\packages\EMGU.CV.3.3.0.2824\lib\net35\Emgu.CV.UI.dll</HintPath>
-    </Reference>
     <Reference Include="Emgu.CV.World">
       <HintPath>..\packages\EMGU.CV.3.3.0.2824\lib\net35\Emgu.CV.World.dll</HintPath>
-    </Reference>
-    <Reference Include="ZedGraph">
-      <HintPath>..\packages\ZedGraph.5.1.5\lib\ZedGraph.dll</HintPath>
     </Reference>
   </ItemGroup>
 

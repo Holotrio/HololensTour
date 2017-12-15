@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Proto;
+using System.Diagnostics;
 using System.Drawing;
 using Emgu;
 using Emgu.CV.Aruco;
@@ -48,22 +49,21 @@ namespace TourBackend
                 // the dictionary codeObjectIDToCodeObject and then we create a new Dictionary with only the 
                 // CodeObjects in it which have the isActive == true
                 case RequestAllVirtualObjects r:
-                                            
-                        // first create a new empty dictionary for the response
-                        Dictionary<int, CodeObject> returnDict = new Dictionary<int, CodeObject>();
-                       
-                        foreach (var entry in codeObjectIDToCodeObject)
-                        {
-                            if (entry.Value.isActive == true)
-                            {
-                                returnDict.Add(entry.Key, entry.Value);
-                            }
-                        }
 
-                        // if we now have the return Dictionary, send the Respond message back to the sender
-                        context.Sender.Tell(new RespondRequestAllVirtualObjects(r.messageID, returnDict));
-                        Console.WriteLine("Recognition Manager says: The work of the RequestAll with ID = '" + r.messageID + "' is done.");
-                    
+                    // first create a new empty dictionary for the response
+                    Dictionary<int, CodeObject> returnDict = new Dictionary<int, CodeObject>();
+
+                    foreach (var entry in codeObjectIDToCodeObject)
+                    {
+                        if (entry.Value.isActive == true)
+                        {
+                            returnDict.Add(entry.Key, entry.Value);
+                        }
+                    }
+
+                    // if we now have the return Dictionary, send the Respond message back to the sender
+                    context.Sender.Tell(new RespondRequestAllVirtualObjects(r.messageID, returnDict));
+
                     break;
 
                 // the idea here is if we get the setActive message we should look up in the dictionary if the 
@@ -71,21 +71,19 @@ namespace TourBackend
                 // send back the response to the sender. If it does not exist in the internal dictionary we should 
                 // respond with a failedTo message.
                 case SetActiveVirtualObject s:
-                                            
-                        if (codeObjectIDToCodeObject.ContainsKey(s.toBeActiveVirtualObjectID))
-                        {
-                            codeObjectIDToCodeObject[s.toBeActiveVirtualObjectID].isActive = true;
-                            // respond to the sender
-                            context.Sender.Tell(new RespondSetActiveVirtualObject(s.messageID, s.toBeActiveVirtualObjectID));
-                            Console.WriteLine("Recognition Manager says: The CodeObject with ID = '" + s.toBeActiveVirtualObjectID + "' is now active");
-                        }
-                        else
-                        {
-                            // respond to the sender with a failedToMessage
-                            context.Sender.Tell(new FailedToSetActiveVirtualObject(s.messageID));
-                            Console.WriteLine("Recognition Manager says: The CodeObject with ID = '" + s.toBeActiveVirtualObjectID + "' which should have been activated, does not exist in the internal dictionary");
-                        }
-                    
+
+                    if (codeObjectIDToCodeObject.ContainsKey(s.toBeActiveVirtualObjectID))
+                    {
+                        codeObjectIDToCodeObject[s.toBeActiveVirtualObjectID].isActive = true;
+                        // respond to the sender
+                        context.Sender.Tell(new RespondSetActiveVirtualObject(s.messageID, s.toBeActiveVirtualObjectID));
+                    }
+                    else
+                    {
+                        // respond to the sender with a failedToMessage
+                        context.Sender.Tell(new FailedToSetActiveVirtualObject(s.messageID));
+                    }
+
                     break;
 
                 // the idea here is if we get the setInActive message we should look up in the dictionary if the 
@@ -93,20 +91,17 @@ namespace TourBackend
                 // send back the response back to the sender. If it does not exist in the internal dictionary we should 
                 // respond with a failedTo message.
                 case SetInActiveVirtualObject s:
-                                          
-                        if (codeObjectIDToCodeObject.ContainsKey(s.toBeInActiveVirtualObjectID))
-                        {
-                            codeObjectIDToCodeObject[s.toBeInActiveVirtualObjectID].isActive = false;
-                            // respond to the sender
-                            context.Sender.Tell(new RespondSetInActiveVirtualObject(s.messageID, s.toBeInActiveVirtualObjectID));
-                            Console.WriteLine("Recognition Manager says: The CodeObject with ID = '" + s.toBeInActiveVirtualObjectID + "' is now inactive");
+
+                    if (codeObjectIDToCodeObject.ContainsKey(s.toBeInActiveVirtualObjectID))
+                    {
+                        codeObjectIDToCodeObject[s.toBeInActiveVirtualObjectID].isActive = false;
+                        // respond to the sender
+                        context.Sender.Tell(new RespondSetInActiveVirtualObject(s.messageID, s.toBeInActiveVirtualObjectID));
                     }
                     else
-                        {
-                            // respond to the sender with a failedToMessage
-                            context.Sender.Tell(new FailedToSetInActiveVirtualObject(s.messageID));
-                            Console.WriteLine("Recognition Manager says: The CodeObject with ID = '" + s.toBeInActiveVirtualObjectID + "' which should have been inactivated, does not exist in the internal dictionary");
-
+                    {
+                        // respond to the sender with a failedToMessage
+                        context.Sender.Tell(new FailedToSetInActiveVirtualObject(s.messageID));
                     }
 
                     break;
@@ -115,13 +110,12 @@ namespace TourBackend
                 // then update the internal dictionary. having done this he should reply to the controlActor that all went well
                 case NewFrameArrived n:
 
-                        Console.WriteLine("Recognition Manager says: The work with the frame with ID = '" + n.id + "' started");
-                        // do the work here with the recognition of the frame
-                        FrameEvaluation(n.bitmap);
-                        // after the successfull evaluation respond to the control Actor
-                        context.Sender.Tell(new RespondNewFrameArrived(n.id));
-                        Console.WriteLine("Recognition Manager says: The work with the frame with ID = '" + n.id + "' is done");
-                    
+                    // do the work here with the recognition of the frame
+                    FrameEvaluation(n.bitmap);
+
+                    // after the successfull evaluation respond to the control Actor
+                    context.Sender.Tell(new RespondNewFrameArrived(n.id));
+
                     break;
             }
             return Actor.Done;
@@ -135,40 +129,43 @@ namespace TourBackend
         /// <param name="_bitmap">
         /// this is the frame, the photo which gets evaluated. it has to be of the type System.Drawing.Bitmap
         /// </param>
-        public void FrameEvaluation(Bitmap _bitmap)
+        public void FrameEvaluation(Mat _bitmap)
         {
+
             // first set all arguments for the DetectMarkers method call
-            Emgu.CV.Image<Bgr, Byte> _image = Utils.BitmapToImage.CreateImagefromBitmap(_bitmap);
+            Emgu.CV.Image<Bgr, Byte> _image = _bitmap.ToImage<Bgr, Byte>();
             var MarkerTypeToFind = new Dictionary(Dictionary.PredefinedDictionaryName.DictArucoOriginal); // here we specify the type of marker we are searching for in the image
             var outCorners = new VectorOfVectorOfPointF();
             var outIDs = new VectorOfInt(); // since the outID has in each element the ID of a recognised Aruco Code Marker which has to be an integer
             DetectorParameters _detectorParameters = DetectorParameters.GetDefault();
-
-            // now detect the markers in the image bitmap and for further information look up the EmguCv documentation
-            Emgu.CV.Aruco.ArucoInvoke.DetectMarkers(_image, MarkerTypeToFind, outCorners, outIDs, _detectorParameters, null);
-            
-            // then define all arguments for the estimatePoseSingleMarkers method call
-            float markerLength = 0.1f; // set the default markerLength which is usually given in the unit meters and it has to be a float number
-            // the cameraMatrix and distortion coefficients are the one for the hololens. the data is from: https://github.com/qian256/HoloLensCamCalib/blob/master/near/hololens896x504.yaml
-            Mat cameraMatrix = new Mat();
-            cameraMatrix.Create(3, 3, Emgu.CV.CvEnum.DepthType.Cv32F, 1);
-            cameraMatrix.SetTo(new[] { 1039.7024546115156f, 0.0f, 401.9889542361556f, 0.0f, 1038.5598693279526f, 179.02511993572065f, 0.0f, 0.0f, 11.0f });
-            Mat distcoeffs = new Mat();
-            distcoeffs.Create(1, 5, Emgu.CV.CvEnum.DepthType.Cv32F, 1);
-            distcoeffs.SetTo(new[] { 0.1611302127599187f, 0.11645978908419138f, -0.020783847362699993f, -0.006686827095385685f, 0.0f });
             Mat rvecs = new Mat();
             Mat tvecs = new Mat();
+            try
+            {
+                // now detect the markers in the image bitmap and for further information look up the EmguCv documentation
+                Emgu.CV.Aruco.ArucoInvoke.DetectMarkers(_image, MarkerTypeToFind, outCorners, outIDs, _detectorParameters, null);
 
-            // now get all the pose in form of a translation vector in tvecs and all rotations in form of a rotation vector in rvecs
-            // and for further information look up the EmguCv documentation or the description of the method "UpdateInternalDictionary"
-            Emgu.CV.Aruco.ArucoInvoke.EstimatePoseSingleMarkers(outCorners, markerLength, cameraMatrix, distcoeffs, rvecs, tvecs);
+                // then define all arguments for the estimatePoseSingleMarkers method call
+                float markerLength = 0.1f; // set the default markerLength which is usually given in the unit meters and it has to be a float number
+                                           // the cameraMatrix and distortion coefficients are the one for the hololens. the data is from: https://github.com/qian256/HoloLensCamCalib/blob/master/near/hololens896x504.yaml
+                Mat cameraMatrix = new Mat();
+                cameraMatrix.Create(3, 3, Emgu.CV.CvEnum.DepthType.Cv32F, 1);
+                cameraMatrix.SetTo(new[] { 1039.7024546115156f, 0.0f, 401.9889542361556f, 0.0f, 1038.5598693279526f, 179.02511993572065f, 0.0f, 0.0f, 11.0f });
+                Mat distcoeffs = new Mat();
+                distcoeffs.Create(1, 5, Emgu.CV.CvEnum.DepthType.Cv32F, 1);
+                distcoeffs.SetTo(new[] { 0.1611302127599187f, 0.11645978908419138f, -0.020783847362699993f, -0.006686827095385685f, 0.0f });
 
-            Console.WriteLine("Recognition Manager says: The Positions and Rotations are extracted out of the frame.");
 
+                // now get all the pose in form of a translation vector in tvecs and all rotations in form of a rotation vector in rvecs
+                // and for further information look up the EmguCv documentation or the description of the method "UpdateInternalDictionary"
+                Emgu.CV.Aruco.ArucoInvoke.EstimatePoseSingleMarkers(outCorners, markerLength, cameraMatrix, distcoeffs, rvecs, tvecs);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+            }
             // now update the internal dictionary with the new data
             UpdateInternalDictionary(outIDs, tvecs, rvecs);
-
-            Console.WriteLine("Recognition Manager says: The internal dictionary is updated according to the frame.");
         }
 
         /// <summary>
@@ -206,7 +203,7 @@ namespace TourBackend
             for (int i = 0; i < _ids.Size; ++i)
             {
                 if (codeObjectIDToCodeObject.ContainsKey(_ids[i]))
-                {                    
+                {
                     // set first the isActive of the recognised CodeObject to true
                     codeObjectIDToCodeObject[_ids[i]].isActive = true;
 

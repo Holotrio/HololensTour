@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Proto;
 using System.Drawing;
+using Emgu.CV;
 
 namespace TourBackend
 {
@@ -17,7 +18,7 @@ namespace TourBackend
         public string id { get; }
         public CameraFeedSyncObject sync;
         public PID ctrlActor;
-        public Bitmap latestBitmap;
+        public Mat latestBitmap;
         public Int64 latestTimestamp;
 
         /// <summary>

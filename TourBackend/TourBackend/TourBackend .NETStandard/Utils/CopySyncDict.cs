@@ -17,10 +17,12 @@ namespace TourBackend
         /// <param name="_dict">Dictionary to be copied</param>
         /// <returns>Deep copy of the given Dictionay</returns>
         public static Dictionary<int, CodeObject> Copy(Dictionary<int, CodeObject> _dict) {
+            //return _dict.ToDictionary(x=>x.Key, x=>new CodeObject(x.Value));
             Dictionary<int, CodeObject> copy = new Dictionary<int, CodeObject>();
 
+
             foreach(KeyValuePair<int, CodeObject> p in _dict){
-                copy.Add(p.Key, new CodeObject(p.Value));
+                    copy.Add(p.Key, new CodeObject(p.Value));
             }
 
             return copy;
