@@ -6,6 +6,7 @@ using Proto;
 using System.Threading;
 using System.IO;
 using System.Reflection;
+using Emgu.CV;
 
 namespace TourBackend
 {
@@ -13,9 +14,6 @@ namespace TourBackend
     public class CameraFeedActor_UnitTest
     {
 
-        ///<summary>
-        ///General Constructor test
-        /// </summary>
         [TestMethod]
         public void Constructor_CameraFeedSyncObject_Test()
         {
@@ -23,11 +21,6 @@ namespace TourBackend
             Assert.AreEqual(test.id, "new");
 
         }
-
-        ///<summary>
-        ///When UpdateFrame is called, an event must be raised s.t. the framework knows 
-        ///that there has been an update.
-        ///</summary>
         [TestMethod]
         public void CameraFeedSyncObject_must_raise_event_when_UpdateFrame_is_called()
         {
@@ -44,30 +37,23 @@ namespace TourBackend
 
             Assert.AreEqual(eventreceived, true);
         }
-        /// <summary>
-        /// General constuctor test
-        /// </summary>
+
         [TestMethod]
         public void NewFrameArrived_must_be_correctly_constructed() {
 
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path = Path.Combine(path, "Resources");
             path = Path.Combine(path, "TestVideo_007.bmp");
+            
+            var testframe = new Mat(path);
 
-            Stream testfile = File.OpenRead(path);
-
-            var testframe = System.Drawing.Bitmap.FromStream(testfile);
-
-            var newframe = new NewFrameArrived("id1", (System.Drawing.Bitmap)testframe);
+            var newframe = new NewFrameArrived("id1", testframe);
 
             Assert.AreEqual("id1", newframe.id);
 
         }
 
-        /// <summary>Test if CameraFeedSyncObject fires an event 
-        /// FrameUpdated and CameraFeedActor listens to it and 
-        /// sends NewFrameArrived to ctrlpid
-        /// </summary>
+        /// <summary>Test if CameraFeedSyncObject fires an event FramUpdated and CameraFeedActor listens to it and sends NewFrameArrived to ctrlpid</summary>
         [TestMethod]
         public void CameraFeedActor_needs_to_get_update_from_CameraFeedSyncObject_when_using_local_frames()
         {
@@ -83,7 +69,7 @@ namespace TourBackend
             var propsctrl = Actor.FromProducer(() => new ControlActor("ctrl", syncobj, null, new Dictionary<int, CodeObject>()));
             var pidctrl = Actor.Spawn(propsctrl);
 
-            // instead of the PID of the control actor the PID of the test actor is given to receive the sent message
+            // Statt der PID des ControlActor wird die des TestActors gegeben um die gesendete Nachricht abzufangen
             var propsSyncActor1 = Actor.FromProducer(() => new CameraFeedActor("CameraFeedActor", syncobj2, pidtest));
             var pidSyncActor1 = Actor.Spawn(propsSyncActor1);
 
@@ -91,8 +77,7 @@ namespace TourBackend
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path = Path.Combine(path, "Resources");
             path = Path.Combine(path, "TestVideo_007.bmp");
-            Stream testfile = File.OpenRead(path);
-            var testframe = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(testfile);
+            var testframe = new Mat(path);
 
             lock (test.thisLock)
             {
@@ -108,5 +93,6 @@ namespace TourBackend
                 Assert.AreEqual(((NewFrameArrived)msg).id, "110100010");
             }
         }
+
     }
 }

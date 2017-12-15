@@ -7,18 +7,13 @@ using System.Threading;
 using System.IO;
 using System.Reflection;
 using System.Diagnostics;
+using Emgu.CV;
 
 namespace TourBackend
 {
     [TestClass]
     public class UnitTest1
     {
-        /// <summary>
-        /// Final integration test. 
-        /// Once a frame, which is correctly put into the framework
-        /// produces valid data at the output,
-        /// the framework basically works.
-        /// </summary>
         [TestMethod]
         public void A_single_frame_needs_to_travel_from_CameraFeedSyncObject_To_SyncActor_with_mock_Frames()
         {
@@ -39,8 +34,7 @@ namespace TourBackend
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path = Path.Combine(path, "Resources");
             path = Path.Combine(path, "ArucoCode_ID_1.bmp");
-            Stream testfile = File.OpenRead(path);
-            var testframe = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(testfile);
+            var testframe =  new Mat(path);
 
             lock (camerafeedsyncobject.thisLock)
             {

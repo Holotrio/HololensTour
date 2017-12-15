@@ -11,11 +11,6 @@ namespace TourBackend
     [TestClass]
     public class SyncActor_UnitTest
     {
-        /// <summary>
-        /// SyncActor must write the current data on SyncObject if it receives
-        /// WriteCurrentTourState
-        /// </summary>
-        /// <returns></returns>
         [TestMethod]
         public async Task SyncActor_needs_to_be_able_to_write_on_SyncObject()
         {
@@ -41,13 +36,11 @@ namespace TourBackend
 
             pidSyncActor1.Stop();
 
-            CollectionAssert.AreEqual((System.Collections.ICollection)obj.dict, (System.Collections.ICollection)dict);
+            Assert.IsTrue(obj.dict.ContainsKey(90909));
+            Assert.IsTrue(obj.dict.ContainsKey(890));
 
         }
-        /// <summary>
-        /// Timestamping on the SyncObject must work correctly
-        /// </summary>
-        /// <returns></returns>
+
         [TestMethod]
         public async Task SyncActor_needs_to_write_different_timestamps_for_different_writes()
         {
@@ -85,10 +78,6 @@ namespace TourBackend
             Assert.AreNotEqual(timestamp1,timestamp2);
 
         }
-        /// <summary>
-        /// The expected answer RespondWriteCurrentTourState must be sent.
-        /// </summary>
-        /// <returns></returns>
         [TestMethod]
         public async Task SyncActor_needs_to_respond_after_writing_on_SyncObject()
         {

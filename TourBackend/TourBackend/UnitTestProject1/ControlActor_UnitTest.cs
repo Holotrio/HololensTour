@@ -9,10 +9,6 @@ namespace TourBackend
     [TestClass]
     public class ControlActor_UnitTest
     {
-        /// <summary>
-        /// Since Control Actor initializes RecognitionManager, SyncActor & CameraFeedSyncActor,
-        /// it must do so correctly
-        /// </summary>
         [TestMethod]
         public void ControlActor_must_correctly_initialize_SyncActor()
         {
@@ -38,10 +34,6 @@ namespace TourBackend
             Assert.AreNotEqual(pidID1, pidID2);
         }
 
-        /// <summary>
-        /// Since Control Actor initializes RecognitionManager, SyncActor & CameraFeedSyncActor,
-        /// it must do so correctly
-        /// </summary>
         [TestMethod]
         public void ControlActor_must_correctly_initialize_RecognitionManager()
         {
@@ -67,9 +59,7 @@ namespace TourBackend
             Assert.AreNotEqual(pidID2, null);
         }
 
-        /// <summary>
-        /// The FrameWork Initialize call must work as is expected
-        /// </summary>
+
         [TestMethod]
         public void ControlActor_must_be_able_to_get_initialized()
         {
