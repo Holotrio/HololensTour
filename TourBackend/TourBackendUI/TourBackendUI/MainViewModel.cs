@@ -129,9 +129,10 @@ namespace TourBackendUI
         {
             if (_frameSource.Ready)
             {
-                var testmat = _frameSource.Mat.Clone();
-
-                UpdateCamerFeedSyncObject(Guid.NewGuid().ToString(), testmat);
+                var frame = _frameSource.Mat.Clone();
+                inputtime = DateTime.Now.Ticks;
+                CameraFeedSyncObject.UpdateCameraFeedSyncObject(inputtime, frame);
+                
             }
         }
 
@@ -139,22 +140,6 @@ namespace TourBackendUI
 
 
         public DispatcherTimer Timer { get; } = new DispatcherTimer();
-
-        /// <summary>
-        /// <para>WPF GUI to Framework</para>
-        /// <para>Updates Camerfeedsyncobjects with the bitmap of the selected picture</para>
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="bitmap"></param>
-        public void UpdateCamerFeedSyncObject(string id, Mat bitmap)
-        {
-            //Debug.WriteLine(Convert.ToBase64String(bitmap.GetData()));
-            inputtime = DateTime.Now.Ticks;
-            CameraFeedSyncObject.timestamp = DateTime.Now.Ticks;
-            CameraFeedSyncObject.bitmap = bitmap.Clone();
-            CameraFeedSyncObject.UpdateFrame();
-            
-        }
 
         /// <summary>
         /// <para>Framework to WPF GUI</para>

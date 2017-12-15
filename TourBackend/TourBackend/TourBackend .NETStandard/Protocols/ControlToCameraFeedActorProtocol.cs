@@ -15,17 +15,17 @@ namespace TourBackend
     public class NewFrameArrived
     {
         public string id;
-        public Mat bitmap;
+        public Mat frame;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="_id">Message ID</param>
-        /// <param name="_bitmap">Bitmap which arrived</param>
-        public NewFrameArrived(string _id, Mat _bitmap)
+        /// <param name="_frame">Frame which arrived</param>
+        public NewFrameArrived(string _id, Mat _frame)
         {
                 id = _id;
-                bitmap = _bitmap;
+                frame = _frame;
         }
     }
 

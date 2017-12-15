@@ -9,10 +9,10 @@ namespace TourBackend
     public class CameraFeedSyncObject
     {
 
-        public Int64 timestamp;
+        public Int64 timestamp { get; private set; }
 
-        public Mat bitmap;
-        public string id;
+        public Mat frame { get; private set; }
+        public readonly string id;
         public object thisLock = new Object();
 
         public event EventHandler FrameUpdated;
@@ -31,9 +31,19 @@ namespace TourBackend
             }
         }
 
-        public void UpdateFrame()
+        /// <summary>
+        /// <para>WPF GUI to Framework</para>
+        /// <para>Updates Camerfeedsyncobjects with the bitmap of the selected picture</para>
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="bitmap"></param>
+        public void UpdateCameraFeedSyncObject(Int64 _timestamp, Mat _frame)
         {
-            OnFrameUpdated(EventArgs.Empty);
+            lock (thisLock) {
+                timestamp = _timestamp;
+                frame = _frame.Clone();
+                OnFrameUpdated(EventArgs.Empty);
+            }
         }
 
     }

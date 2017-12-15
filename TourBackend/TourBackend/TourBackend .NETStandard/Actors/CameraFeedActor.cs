@@ -16,11 +16,11 @@ namespace TourBackend
     public class CameraFeedActor : IActor
     {
 
-        public string id { get; }
-        public CameraFeedSyncObject sync;
-        public PID ctrlActor;
-        public Mat latestBitmap;
-        public Int64 latestTimestamp;
+        public string id { get; private set; }
+        private CameraFeedSyncObject sync;
+        private PID ctrlActor;
+        private Mat latestframe;
+        private Int64 latestTimestamp;
 
         /// <summary>
         /// Started by ControlActor. [Internal Use]
@@ -43,10 +43,6 @@ namespace TourBackend
         /// <returns></returns>
         public Task ReceiveAsync(IContext context)
         {
-            var msg = context.Message;
-            switch (msg)
-            {
-            }
             return Actor.Done;
         }
 
@@ -59,14 +55,11 @@ namespace TourBackend
         {
             if (true) // Condition here is to be defined... might make sense to only process every second frame or so
             {
-                lock (sync.thisLock)
-                {
-                    latestBitmap = sync.bitmap;
-                    latestTimestamp = sync.timestamp;
-                }
-                Debug.WriteLine("CamSync: " + latestBitmap.Width);
-                ctrlActor.Tell(new NewFrameArrived(latestTimestamp.ToString(), latestBitmap.Clone()));
-                Console.WriteLine("CameraFeedSyncObject says: New Frame Arrived");
+                latestframe = sync.frame;
+                latestTimestamp = sync.timestamp;
+                Debug.WriteLine("CamSync: " + latestframe.Width);
+                ctrlActor.Tell(new NewFrameArrived(latestTimestamp.ToString(), latestframe.Clone()));
+                Debug.WriteLine("CameraFeedSyncObject says: New Frame Arrived");
             }
         }
 

@@ -7,7 +7,7 @@ namespace TourBackend
     public class CodeObject
     {
 
-        public int id = -1;
+        public int id { get; } = -1;
 
         public bool isActive = true;
         public double[] position;

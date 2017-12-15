@@ -60,7 +60,7 @@ namespace TourBackend
         /// Returns own PID. [Internal Use]
         /// </summary>
         /// <returns></returns>
-        public PID GetPID()
+        private PID GetPID()
         {
             return this.pidctrl;
         }

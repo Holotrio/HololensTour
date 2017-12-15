@@ -27,7 +27,7 @@ namespace TourBackend
         // this dictionary is created when the recognition manager gets initialized by the control actor and
         // it stays static meaning that the key to value relations will not change. The only thing that changes
         // are the codeObject properties like rotation, position, isActive...
-        public Dictionary<int, CodeObject> codeObjectIDToCodeObject = new Dictionary<int, CodeObject>();
+        private Dictionary<int, CodeObject> codeObjectIDToCodeObject = new Dictionary<int, CodeObject>();
 
         // constructor
         public RecognitionManager(string id, Dictionary<int, CodeObject> _dict)
@@ -111,7 +111,7 @@ namespace TourBackend
                 case NewFrameArrived n:
 
                     // do the work here with the recognition of the frame
-                    FrameEvaluation(n.bitmap);
+                    FrameEvaluation(n.frame);
 
                     // after the successfull evaluation respond to the control Actor
                     context.Sender.Tell(new RespondNewFrameArrived(n.id));
@@ -129,11 +129,11 @@ namespace TourBackend
         /// <param name="_bitmap">
         /// this is the frame, the photo which gets evaluated. it has to be of the type System.Drawing.Bitmap
         /// </param>
-        public void FrameEvaluation(Mat _bitmap)
+        private void FrameEvaluation(Mat _frame)
         {
 
             // first set all arguments for the DetectMarkers method call
-            Emgu.CV.Image<Bgr, Byte> _image = _bitmap.ToImage<Bgr, Byte>();
+            Emgu.CV.Image<Bgr, Byte> _image = _frame.ToImage<Bgr, Byte>();
             var MarkerTypeToFind = new Dictionary(Dictionary.PredefinedDictionaryName.DictArucoOriginal); // here we specify the type of marker we are searching for in the image
             var outCorners = new VectorOfVectorOfPointF();
             var outIDs = new VectorOfInt(); // since the outID has in each element the ID of a recognised Aruco Code Marker which has to be an integer
@@ -142,7 +142,7 @@ namespace TourBackend
             Mat tvecs = new Mat();
             try
             {
-                // now detect the markers in the image bitmap and for further information look up the EmguCv documentation
+                // now detect the markers in the image frame and for further information look up the EmguCv documentation
                 Emgu.CV.Aruco.ArucoInvoke.DetectMarkers(_image, MarkerTypeToFind, outCorners, outIDs, _detectorParameters, null);
 
                 // then define all arguments for the estimatePoseSingleMarkers method call
@@ -186,7 +186,7 @@ namespace TourBackend
         /// which describe the rotation. they form a vector. its direction describes the rotation axis and its length defines the rotation 
         /// in radian degree. The order which marker is in which row is exactly according to the order of the _ids vectorOfInt.
         /// </param>
-        public void UpdateInternalDictionary(VectorOfInt _ids, Mat _translationVectors, Mat _rotationVectors)
+        private void UpdateInternalDictionary(VectorOfInt _ids, Mat _translationVectors, Mat _rotationVectors)
         {
             // first define the parameters to be able to test them in a boolean expression
             int idSize = _ids.Size;

@@ -22,7 +22,7 @@ namespace TourBackend
 
         }
         [TestMethod]
-        public void CameraFeedSyncObject_must_raise_event_when_UpdateFrame_is_called()
+        public void CameraFeedSyncObject_must_raise_event_when_UpdateCameraFeedSyncObject_is_called()
         {
             CameraFeedSyncObject test = new CameraFeedSyncObject("new");
 
@@ -33,18 +33,19 @@ namespace TourBackend
                     eventreceived = true;
                 };
 
-            test.UpdateFrame();
+            test.UpdateCameraFeedSyncObject(1, new Mat());
 
             Assert.AreEqual(eventreceived, true);
         }
 
         [TestMethod]
-        public void NewFrameArrived_must_be_correctly_constructed() {
+        public void NewFrameArrived_must_be_correctly_constructed()
+        {
 
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path = Path.Combine(path, "Resources");
             path = Path.Combine(path, "ArucoCode_ID_1.bmp");
-            
+
             var testframe = new Mat(path);
 
             var newframe = new NewFrameArrived("id1", testframe);
@@ -73,20 +74,13 @@ namespace TourBackend
             var propsSyncActor1 = Actor.FromProducer(() => new CameraFeedActor("CameraFeedActor", syncobj2, pidtest));
             var pidSyncActor1 = Actor.Spawn(propsSyncActor1);
 
-            // Creates a testframe from local bitmaps
+            // Creates a testframe from local frames
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path = Path.Combine(path, "Resources");
             path = Path.Combine(path, "ArucoCode_ID_1.bmp");
             var testframe = new Mat(path);
 
-            lock (test.thisLock)
-            {
-                test.bitmap = testframe;
-                test.timestamp = 110100010;
-            }
-            // The timestamp is also the message id
-
-            test.UpdateFrame();
+            test.UpdateCameraFeedSyncObject(110100010, testframe);
 
             if (msg.GetType() == typeof(NewFrameArrived))
             {

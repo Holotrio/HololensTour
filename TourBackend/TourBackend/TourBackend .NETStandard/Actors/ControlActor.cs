@@ -110,13 +110,13 @@ namespace TourBackend
                     self = s.ctrl;
                     this.Start(); // Start the essential actors RecognitionManager, SyncActor & CameraFeedSyncManager
                     context.Sender.Tell(new RespondStartFramework(syncActor, recognitionManager, cameraFeedSyncActor));
-                    Console.WriteLine("ControlActor has been started");
+                    Debug.WriteLine("ControlActor has been started");
                     break;
 
                 /*This message should arrive everytime a new frame has been deposited on the CameraFeedSyncObject*/
                 case NewFrameArrived n:
-                    recognitionManager.Request(new NewFrameArrived(n.id, n.bitmap), self);
-                    Console.WriteLine("ControlActor says: Frame arrived");
+                    recognitionManager.Request(new NewFrameArrived(n.id, n.frame), self);
+                    Debug.WriteLine("ControlActor says: Frame arrived");
                     break;
 
                 /*This message is sent by the RecognitionManager, telling the ControlActor that it is done evaluatng the current frame
@@ -124,7 +124,7 @@ namespace TourBackend
 
                 case RespondNewFrameArrived r:
                     recognitionManager.Request(new RequestAllVirtualObjects(r.messageID, TimeSpan.FromMilliseconds(25)), self);
-                    Console.WriteLine("ControlActor says: RecognitionManager has evaulated Frame");
+                    Debug.WriteLine("ControlActor says: RecognitionManager has evaulated Frame");
                     break;
 
                 /*This message is sent by the RecognitionManager, telling the ControlActor the currently active Markers
@@ -132,7 +132,7 @@ namespace TourBackend
                  The ControlActor then tells the SyncActor to make the data available to the user.*/
                 case RespondRequestAllVirtualObjects r:
                     syncActor.Request(new WriteCurrentTourState(r.messageID, r.newCodeObjectIDToCodeObject), self);
-                    Console.WriteLine("ControlActor says: Requesting write of Current Tour State");
+                    Debug.WriteLine("ControlActor says: Requesting write of Current Tour State");
                     break;
             }
             return Actor.Done;
