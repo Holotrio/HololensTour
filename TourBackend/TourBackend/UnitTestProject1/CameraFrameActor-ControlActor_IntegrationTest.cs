@@ -36,14 +36,7 @@ namespace TourBackend
             path = Path.Combine(path, "Webcam_Aruco.jpg");
             var testframe =  new Mat(path);
 
-            lock (camerafeedsyncobject.thisLock)
-            {
-                camerafeedsyncobject.bitmap = testframe;
-                camerafeedsyncobject.timestamp = 110100010;
-            }
-            // The timestamp is also the message id
-
-            camerafeedsyncobject.UpdateFrame();
+            camerafeedsyncobject.UpdateCameraFeedSyncObject(110100010, testframe);
 
             // See if the output has been updated within 1 second
             Stopwatch stop = new Stopwatch();

@@ -6,12 +6,12 @@ namespace TourBackend
 {
     public class SyncObject
     {
-        public Int64 timestamp;
+        public Int64 timestamp { get; private set; }
 
         public object thisLock = new Object();
 
-        public string objectid;
-        public Dictionary<int, CodeObject> dict;
+        public string objectid { get; private set; }
+        public Dictionary<int, CodeObject> dict { get; private set; }
 
         //Basic Konstruktor 
         public SyncObject(string _objectid, Dictionary<int, CodeObject> _dict)
@@ -33,9 +33,14 @@ namespace TourBackend
             }
         }
 
-        public void UpdateSyncObject()
+        public void UpdateSyncObject(Int64 _timestamp, Dictionary<int, CodeObject> _dict)
         {
-            OnSyncObjectUpdated(EventArgs.Empty);
+            lock (thisLock)
+            {
+                timestamp = _timestamp;
+                dict = _dict;
+                OnSyncObjectUpdated(EventArgs.Empty);
+            }
         }
 
         public void SetTimeStamp(Int64 _timestamp)

@@ -121,15 +121,6 @@
     <None Include="TourBackendUI_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Emgu.CV.World">
-      <HintPath>..\packages\EMGU.CV.3.3.0.2824\lib\net35\Emgu.CV.World.dll</HintPath>
-    </Reference>
-    <Reference Include="TourBackend .NETStandard, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\x86\Debug\TourBackend .NETStandard.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="cvextern.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -191,6 +182,15 @@
     <PackageReference Include="Proto.Actor">
       <Version>0.1.14</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Emgu.CV.World">
+      <HintPath>..\..\..\UWP_WPFGUI\TourBackendUI\TourBackendUI\bin\x86\Debug\Emgu.CV.World.dll</HintPath>
+    </Reference>
+    <Reference Include="TourBackend .NETStandard, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x86\Debug\TourBackend .NETStandard.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <!--<Import Project="C:\Program Files (x86)\emgucv\Emgu.CV.Contrib\Emgu.CV.Contrib.projitems" Label="Shared" />
   <Import Project="C:\Program Files (x86)\emgucv\Emgu.CV\Emgu.CV.projitems" Label="Shared" />

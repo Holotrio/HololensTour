@@ -26,10 +26,14 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        
+
         <StackPanel Grid.Row="1">
             <Button Content="Init Camera" Command="{Binding InitCam}"/>
         </StackPanel>
-        
+        <TextBlock HorizontalAlignment="Left" Margin="66,45,0,-68" Grid.RowSpan="2" TextWrapping="Wrap" VerticalAlignment="Top" Width="265" Height="23" Foreground="White">
+            <Run>Round trip time: </Run>
+            <Run  Text="{Binding Path=rtt}"/>
+            <Run> ms</Run>
+        </TextBlock>
     </Grid>
 </Page>

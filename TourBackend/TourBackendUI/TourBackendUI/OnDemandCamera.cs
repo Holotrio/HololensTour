@@ -12,17 +12,22 @@ namespace TourBackendUI
     {
         private Mat _mat = new Mat();
         private DispatcherTimer _timer = new DispatcherTimer();
+
         public OnDemandCamera(int fps)
         {
             _timer.Interval = TimeSpan.FromMilliseconds(1000d / fps);
             _timer.Tick += Grab;
             _timer.Start();
         }
-
+        /// <summary>
+        /// Gets a new Mat from the Camera.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="ea"></param>
         private async void Grab(object sender, object ea)
         {
             var app = Application.Current as App;
-            if (app?.WebcamReciever?.MediaCapture == null) return;
+            if (app?.WebcamReciever?.MediaCapture == null  || Ready == false) return;
             try
             {
                 _mat = await app.WebcamReciever.GrabMat();
@@ -35,7 +40,7 @@ namespace TourBackendUI
 
         private App App => Application.Current as App;
         private WebcamReciever WebcamReciever => App?.WebcamReciever;
-        public bool Ready => WebcamReciever != null && WebcamReciever.Ready;
+        public bool Ready => WebcamReciever != null && WebcamReciever.Ready && _mat != null;
         public Mat Mat => Ready ? _mat : throw new InvalidOperationException("camera not ready");
         public WriteableBitmap WriteableBitmap => Mat.ToWritableBitmap();
         public Image<Bgr, byte> ImageBgrByte => Mat.ToImage<Bgr, byte>();

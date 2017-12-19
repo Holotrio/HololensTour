@@ -24,7 +24,6 @@ namespace TourBackendUI
         public Dictionary<int, CodeObject> CopyOfDict = new Dictionary<int, CodeObject>();
 
         private readonly OnDemandCamera _frameSource;
-        CommandTestFrames _frames;
 
         readonly FrameWork _frameWork;
         private MediaCapture _mediaCapture;
@@ -32,7 +31,7 @@ namespace TourBackendUI
 
         public Int64 inputtime;
         public Int64 outputtime;
-        public Int64 rtt;
+        public Int64 _rtt;
 
         //int numbersOfMarker = 1;
 
@@ -43,6 +42,15 @@ namespace TourBackendUI
             {
                 if (Equals(value, _mediaCapture)) return;
                 _mediaCapture = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public String rtt
+        {
+            get { return _rtt.ToString(); }
+            set
+            {
                 OnPropertyChanged();
             }
         }
@@ -68,31 +76,37 @@ namespace TourBackendUI
                 1,2,3,4,5,6,7
             };
         }
-
+        /// <summary>
+        /// Initializes to functionality of the UI
+        /// </summary>
+        /// <param name="streamPreview"></param>
         public MainViewModel(ref CaptureElement streamPreview)
         {
             _stream = streamPreview;
 
             Markers = new ObservableCollection<int>
             {
-                1,2,3
+
             };
             InitCam = new RelayCommand(InitCamera);
-            Timer.Interval = new TimeSpan(0, 0, 1);
-            Timer.Tick += GetFrame;
-
-
-            SyncObject.SetTimeStamp(_lasttimestamp);
-
-            SyncObject.SyncObjectUpdated += OnSyncObjectUpdated;
             _frameSource = new OnDemandCamera(30);
 
+            //Get a new Frame into the framework once per 40ms
+            Timer.Interval = new TimeSpan(0, 0, 0, 0, 40);
+            Timer.Tick += GetFrame;
+
+            SyncObject.SetTimeStamp(_lasttimestamp);
+            SyncObject.SyncObjectUpdated += OnSyncObjectUpdated;
+
+            //Set up the framework such that it recognizes all 1024 "traditional" markers
             CodeObject[] codeobjs = new CodeObject[1024];
             var dict = Utils.HelpForTesting.CreateDictionaryForInitialization(1024);
-            foreach (KeyValuePair<int, CodeObject> pair in dict) {
-                codeobjs.SetValue(pair.Value, pair.Key-1);
+            foreach (KeyValuePair<int, CodeObject> pair in dict)
+            {
+                codeobjs.SetValue(pair.Value, pair.Key - 1);
             }
 
+            //Initialize framework
             _frameWork = new FrameWork(SyncObject, CameraFeedSyncObject, codeobjs);
             _frameWork.Initialize();
 
@@ -100,6 +114,9 @@ namespace TourBackendUI
 
         }
 
+        /// <summary>
+        /// Initializes the camera
+        /// </summary>
         public async void InitCamera()
         {
             var app = Application.Current as App;
@@ -120,18 +137,22 @@ namespace TourBackendUI
             catch (Exception e)
             {
                 Debug.WriteLine("Initializing camera failed:");
-               // Debug.WriteLine(e);
             }
 
         }
 
+        /// <summary>
+        /// Helper function to feed new frames into the framework
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void GetFrame(object sender, object e)
         {
             if (_frameSource.Ready)
             {
-                var testmat = _frameSource.Mat.Clone();
-
-                UpdateCamerFeedSyncObject(Guid.NewGuid().ToString(), testmat);
+                var frame = _frameSource.Mat.Clone();
+                inputtime = DateTime.Now.Ticks;
+                CameraFeedSyncObject.UpdateCameraFeedSyncObject(inputtime, frame);
             }
         }
 
@@ -141,33 +162,17 @@ namespace TourBackendUI
         public DispatcherTimer Timer { get; } = new DispatcherTimer();
 
         /// <summary>
-        /// <para>WPF GUI to Framework</para>
-        /// <para>Updates Camerfeedsyncobjects with the bitmap of the selected picture</para>
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="bitmap"></param>
-        public void UpdateCamerFeedSyncObject(string id, Mat bitmap)
-        {
-            //Debug.WriteLine(Convert.ToBase64String(bitmap.GetData()));
-            inputtime = DateTime.Now.Ticks;
-            CameraFeedSyncObject.timestamp = DateTime.Now.Ticks;
-            CameraFeedSyncObject.bitmap = bitmap.Clone();
-            CameraFeedSyncObject.UpdateFrame();
-            
-        }
-
-        /// <summary>
         /// <para>Framework to WPF GUI</para>
         /// <para>Event which will call GetTourState when SyncObject is updated</para>
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        protected void OnSyncObjectUpdated(object sender, EventArgs e)
+        protected async void OnSyncObjectUpdated(object sender, EventArgs e)
         {
             GetTourState();
             outputtime = DateTime.Now.Ticks;
-            rtt = outputtime - inputtime;
-            // Make it shine, boy
+            _rtt = (outputtime - inputtime) / 10000;
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => rtt = _rtt.ToString());
         }
 
 
@@ -179,17 +184,23 @@ namespace TourBackendUI
             if (SyncObject.timestamp != _lasttimestamp)
             {
                 _lasttimestamp = SyncObject.timestamp;
-                CopyOfDict = DeepCopy.CopyInt(SyncObject.dict);
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => Markers.Clear());
                 //ReadDictionaryData
-                foreach (int objectid in SyncObject.dict.Keys)
+                int[] tempmarkers = new int[Markers.Count];
+                Markers.CopyTo(tempmarkers, 0);
+                foreach (int objectid in tempmarkers)
                 {
                     //CodeObject with current key
-                    CodeObject obj = CopyOfDict[objectid];
-
-                    //Add items to dropdownlist 
-                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => Markers.Add(obj.id));
-
+                    if (!SyncObject.dict.ContainsKey(objectid))
+                    {
+                        await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => Markers.Remove(objectid));
+                    }
+                }
+                foreach (int objectid in SyncObject.dict.Keys)
+                {
+                    if (!Markers.Contains(objectid))
+                    {
+                        await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => Markers.Add(objectid));
+                    }
                 }
             }
         }

@@ -19,6 +19,11 @@ namespace TourBackendUI
 {
     public static class Helpers
     {
+        /// <summary>
+        /// Converts an Emgu Mat to a WritableBitmap
+        /// </summary>
+        /// <param name="mat">Mat to be converted</param>
+        /// <returns></returns>
         public static WriteableBitmap ToWritableBitmap(this Mat mat)
         {
             var size = mat.Size;
@@ -37,6 +42,11 @@ namespace TourBackendUI
             return bmp;
         }
 
+        /// <summary>
+        /// Converts a StorageFile to an Emgu Mat
+        /// </summary>
+        /// <param name="file">StorageFile to be converted</param>
+        /// <returns></returns>
         public static async Task<Mat> ToMatAsync(this StorageFile file)
         {
             using (var fileStream = await file.OpenAsync(FileAccessMode.Read))
@@ -61,28 +71,38 @@ namespace TourBackendUI
                 }
             }
         }
-
+        // Attention: Do NOT use in conjunction with Preview - Doesn't work!
+        /// <summary>
+        /// Is supposed to convert a MediaCapture to an Emgu Mat
+        /// </summary>
+        /// <param name="mediaCapture"></param>
+        /// <returns></returns>
         public static async Task<Mat> ToMatAsync(this MediaCapture mediaCapture)
         {
             using (var stream = new InMemoryRandomAccessStream())
             {
                 //await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () => await mediaCapture.CapturePhotoToStreamAsync(Windows.Media.MediaProperties.ImageEncodingProperties.CreatePng(), stream));
+                await mediaCapture.StopPreviewAsync();
                 await mediaCapture.CapturePhotoToStreamAsync(Windows.Media.MediaProperties.ImageEncodingProperties.CreatePng(), stream);
+                await mediaCapture.StartPreviewAsync();
                 stream.Seek(0);
                 var data = new byte[stream.Size];
                 await stream.AsStreamForRead().ReadAsync(data, 0, data.Length);
+                stream.Dispose();
                 var result = new Mat();
                 if (data.Length != 0)
                 {
                     CvInvoke.Imdecode(data, ImreadModes.AnyColor, result);
                 }
-                else {
+                else
+                {
                     Debug.WriteLine("Buffer length = 0");
                 }
                 //var img = result.ToImage<Bgr, byte>();
                 //var s = img.ToJpegData();
                 //Debug.WriteLine(Convert.ToBase64String(s));
                 return result;
+
             }
         }
     }
