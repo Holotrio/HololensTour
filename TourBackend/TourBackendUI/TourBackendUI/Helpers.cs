@@ -92,7 +92,7 @@ namespace TourBackendUI
                 var result = new Mat();
                 if (data.Length != 0)
                 {
-                    CvInvoke.Imdecode(data, ImreadModes.AnyColor, result);
+                    CvInvoke.Imdecode(data, ImreadModes.Grayscale, result);
                 }
                 else
                 {

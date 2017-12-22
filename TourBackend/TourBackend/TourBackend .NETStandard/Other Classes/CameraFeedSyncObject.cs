@@ -39,10 +39,12 @@ namespace TourBackend
         /// <param name="bitmap"></param>
         public void UpdateCameraFeedSyncObject(Int64 _timestamp, Mat _frame)
         {
-            lock (thisLock) {
-                timestamp = _timestamp;
-                frame = _frame.Clone();
-                OnFrameUpdated(EventArgs.Empty);
+            if (_frame != null) {
+                lock (thisLock) {
+                    timestamp = _timestamp;
+                    frame = _frame.Clone();
+                    OnFrameUpdated(EventArgs.Empty);
+                }
             }
         }
 
